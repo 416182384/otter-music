@@ -1,8 +1,5 @@
 import { useEffect, useRef } from "react";
-import { retry } from "@/lib/utils";
-import { musicApi } from "@/lib/music-api";
 import { getProxyUrl, isProxyUrl } from "@/lib/api";
-import { normalizeAudioUrlForPlayback } from "@/lib/utils/audio-url";
 import { useMusicStore } from "@/store/music-store";
 import { useSourceQualityStore } from "@/store/source-quality-store";
 import { useDownloadStore } from "@/store/download-store";
@@ -14,6 +11,7 @@ import type { MusicSource } from "@/types/music";
 import toast from "react-hot-toast";
 import { handleAutoMatch } from "@/lib/audio-match";
 import { logger } from "@/lib/logger";
+import { resolveTrackUrl } from "@/lib/audio-resolver";
 
 const AUDIO_READY_TIMEOUT = 8000;
 type FallbackStage = "none" | "proxy" | "final";
@@ -80,24 +78,6 @@ function waitForAudioReady(
     audio.addEventListener("loadedmetadata", onReady, { once: true });
     audio.addEventListener("error", onError, { once: true });
   });
-}
-
-/** 获取远程音频 URL 并带有重试机制 */
-async function resolveRemoteAudioUrl(
-  trackId: string,
-  source: MusicSource,
-  quality: number
-): Promise<string> {
-  const maxRetries = navigator.onLine ? 2 : 0;
-  return retry(
-    async () => {
-      const url = await musicApi.getUrl(trackId, source, quality);
-      if (!url) throw new Error("EMPTY_URL");
-      return url;
-    },
-    maxRetries,
-    800
-  );
 }
 
 export function useAudioTrackLoader(
@@ -192,46 +172,18 @@ export function useAudioTrackLoader(
 
       /** 解析获取最佳 URL (本地 -> 内存缓存 -> 离线库 -> 网络) */
       const resolveOptimalUrl = async () => {
-        // 本地下载资源
-        if (Capacitor.isNativePlatform() && source !== "local") {
-          const dlKey = buildDownloadKey(source, trackId);
-          const uri = useDownloadStore.getState().getUri(dlKey);
-          if (uri) return { url: Capacitor.convertFileSrc(uri), dlKey };
-        }
-
+        // 代理备用线路容灾时，直接使用已缓存的远程 URL
         if (remoteUrlRef.current) return { url: remoteUrlRef.current };
 
-        // 缓存资源
-        const cacheStore = useUrlCacheStore.getState();
-        const memCached = cacheStore.get(trackKey);
-        if (memCached)
-          return {
-            url: (remoteUrlRef.current =
-              normalizeAudioUrlForPlayback(memCached)),
-          };
-
-        // 校验 trackSource 防止 _netease 与 GD netease 同 ID 时命中旧缓存（如 30s 试听片段）
-        const offlineRecord = useOfflineStore.getState().records?.[trackId];
-        if (offlineRecord && offlineRecord.trackSource === source) {
-          return {
-            url: (remoteUrlRef.current = normalizeAudioUrlForPlayback(
-              offlineRecord.url
-            )),
-          };
-        }
-
-        if (!navigator.onLine) return { url: "" };
-
-        // 远端资源
-        const queryId =
-          source === "local" || source === "podcast" ? urlId : trackId;
-        const remoteUrl = await resolveRemoteAudioUrl(
-          queryId || "",
-          source,
+        const result = await resolveTrackUrl(
+          currentTrack,
           parseInt(quality, 10)
         );
-        cacheStore.set(trackKey, remoteUrl);
-        return { url: (remoteUrlRef.current = remoteUrl) };
+        // 同步到 remoteUrlRef 以支持代理备用线路容灾
+        if (result.url && !result.dlKey) {
+          remoteUrlRef.current = result.url;
+        }
+        return result;
       };
 
       try {
