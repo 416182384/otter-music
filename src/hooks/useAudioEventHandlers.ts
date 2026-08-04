@@ -65,9 +65,10 @@ export function useAudioEventHandlers(
         const duration = audio.duration || 0;
         state.setDuration(duration);
 
-        // 检测网易云试听片段
+        // 检测网易云试听片段（音频时长可能是浮点型）
         const isNeteaseSample =
-          [30, 45, 60].includes(duration) || audio.src.includes("jdusicrep-ts");
+          [30, 45, 60].some((d) => Math.abs(duration - d) < 1) ||
+          audio.src.includes("jdusicrep-ts");
         if (
           state.enableAutoMatch &&
           track?.source === "_netease" &&
