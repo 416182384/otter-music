@@ -2,6 +2,9 @@ import {
   useMusicStore,
   type FullScreenBackgroundMode,
 } from "@/store/music-store";
+import { useAppStore } from "@/store/app-store";
+import { usePodcastStore } from "@/store/podcast-store";
+import { useAlistStore } from "@/store/alist-store";
 import { cleanTrack } from "@/lib/utils/music";
 import { withMeta } from "@/store/music-store/shared";
 import type {
@@ -10,6 +13,8 @@ import type {
   MusicSource,
   SourceConfig,
 } from "@/types/music";
+import type { PodcastRssSource } from "@/types/podcast";
+import type { AlistServer } from "@/types/alist";
 import { Capacitor } from "@capacitor/core";
 import { Encoding, Filesystem } from "@capacitor/filesystem";
 import { STORAGE_CONFIG } from "@/lib/storage-manager";
@@ -79,6 +84,7 @@ interface BackupPayload {
   enableAutoMatch: boolean;
   autoMatchFavorites: boolean;
   autoMatchPlaylists: boolean;
+  enableProxyFallback: boolean;
   bilibiliKeepOriginalMeta: boolean;
   bilibiliAutoMatchSuffix: string;
   fullScreenBackgroundMode: FullScreenBackgroundMode;
@@ -89,6 +95,9 @@ interface BackupPayload {
   downloadDirectory: string;
   sleepTimerDuration: number;
   playbackSpeed: number;
+  enableUpdateNotify: boolean;
+  rssSources: PodcastRssSource[];
+  servers: AlistServer[];
 }
 
 /** 校验成功结果 */
@@ -139,6 +148,7 @@ export function serializeStoreData(): string {
     enableAutoMatch: state.enableAutoMatch,
     autoMatchFavorites: state.autoMatchFavorites,
     autoMatchPlaylists: state.autoMatchPlaylists,
+    enableProxyFallback: state.enableProxyFallback,
     bilibiliKeepOriginalMeta: state.bilibiliKeepOriginalMeta,
     bilibiliAutoMatchSuffix: state.bilibiliAutoMatchSuffix,
     fullScreenBackgroundMode: state.fullScreenBackgroundMode,
@@ -149,6 +159,9 @@ export function serializeStoreData(): string {
     downloadDirectory: state.downloadDirectory,
     sleepTimerDuration: state.sleepTimerDuration,
     playbackSpeed: state.playbackSpeed,
+    enableUpdateNotify: useAppStore.getState().enableUpdateNotify,
+    rssSources: usePodcastStore.getState().rssSources,
+    servers: useAlistStore.getState().servers,
   };
 
   const envelope: BackupEnvelope = {
@@ -332,5 +345,16 @@ export function importStoreData(payload: BackupPayload): void {
     embedLyric: payload.embedLyric ?? true,
     downloadDirectory: payload.downloadDirectory ?? "",
     sleepTimerDuration: payload.sleepTimerDuration ?? 30,
+    enableProxyFallback: payload.enableProxyFallback ?? true,
   });
+
+  useAppStore.setState({
+    enableUpdateNotify: payload.enableUpdateNotify ?? true,
+  });
+  if (payload.rssSources) {
+    usePodcastStore.getState().setRssSources(payload.rssSources);
+  }
+  if (payload.servers) {
+    useAlistStore.getState().setServers(payload.servers);
+  }
 }
