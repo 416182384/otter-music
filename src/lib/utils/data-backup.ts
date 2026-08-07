@@ -10,9 +10,50 @@ import type {
   MusicSource,
   SourceConfig,
 } from "@/types/music";
+import { Capacitor } from "@capacitor/core";
+import { Encoding, Filesystem } from "@capacitor/filesystem";
+import { STORAGE_CONFIG } from "@/lib/storage-manager";
+import { logger } from "@/lib/logger";
 
 /** 备份数据版本号 */
 const CURRENT_VERSION = 1;
+
+function backupFileName(): string {
+  return `otter-music-backup-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+}
+
+/** 将备份保存为用户可访问的 JSON 文件，兼容原生端和 Web 端。 */
+export async function saveBackupFile(json: string): Promise<string> {
+  const fileName = backupFileName();
+
+  try {
+    if (Capacitor.isNativePlatform()) {
+      const path = `${STORAGE_CONFIG.ROOT}/${fileName}`;
+      await Filesystem.writeFile({
+        path,
+        data: json,
+        directory: STORAGE_CONFIG.BASE_DIR,
+        encoding: Encoding.UTF8,
+        recursive: true,
+      });
+      return path;
+    }
+
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
+    return fileName;
+  } catch (error) {
+    logger.error("data-backup", "Save backup file failed", error);
+    throw error;
+  }
+}
 
 /** 备份 JSON 顶层结构 */
 interface BackupEnvelope {
