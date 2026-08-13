@@ -39,7 +39,7 @@ export function getQqUinFromCookie(cookie: string): string | null {
 
   const wxuin = values.get("wxuin");
   if (!wxuin) return null;
-  return `1${wxuin.replace(/^o/, "")}`;
+  return wxuin.startsWith("o") ? `1${wxuin.slice(1)}` : wxuin;
 }
 
 function parseResponse(data: unknown): QqUserInfoResponse {
@@ -57,7 +57,8 @@ function isVipUser(value: Record<string, unknown> | undefined): boolean {
 export async function getQqUserByCookie(
   cookie: string
 ): Promise<QqUserProfile | null> {
-  if (!IS_NATIVE) return null;
+  const isWebDev = !IS_NATIVE && import.meta.env.DEV;
+  if (!IS_NATIVE && !isWebDev) return null;
   const trimmedCookie = normalizeQqCookie(cookie);
   const uin = getQqUinFromCookie(trimmedCookie);
   if (!trimmedCookie || !uin) return null;
@@ -81,6 +82,16 @@ export async function getQqUserByCookie(
     "&hostUin=0&inCharset=utf8&outCharset=utf-8&platform=yqq.json&needNewCode=0&data=" +
     encodeURIComponent(JSON.stringify(payload));
 
+  if (isWebDev) {
+    const response = await fetch(
+      url.replace("https://u.y.qq.com", "/api/qqmusic-search"),
+      { headers: { "X-Real-Cookie": trimmedCookie } }
+    );
+    if (response.status >= 400) return null;
+    const data = parseResponse(await response.json());
+    return buildQqUserProfile(data, uin);
+  }
+
   const response = await CapacitorHttp.request({
     method: "GET",
     url,
@@ -89,6 +100,13 @@ export async function getQqUserByCookie(
   if (response.status >= 400) return null;
 
   const data = parseResponse(response.data);
+  return buildQqUserProfile(data, uin);
+}
+
+function buildQqUserProfile(
+  data: QqUserInfoResponse,
+  uin: string
+): QqUserProfile | null {
   const info = data.base?.data?.map_userinfo?.[uin];
   if (!info?.nick) return null;
 

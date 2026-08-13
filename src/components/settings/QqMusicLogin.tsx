@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, User, Loader2 } from "lucide-react";
+import { Copy, LogOut, User, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Drawer,
@@ -17,6 +17,7 @@ import {
   normalizeQqCookie,
 } from "@/lib/qqmusic/qqmusic-auth";
 import { useQqStore } from "@/store/qq-store";
+import { writeClipboardText } from "@/lib/clipboard";
 import toast from "react-hot-toast";
 
 export function QqMusicLogin() {
@@ -25,7 +26,7 @@ export function QqMusicLogin() {
   const [cookie, setCookie] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (!IS_NATIVE) return null;
+  if (!IS_NATIVE && !import.meta.env.DEV) return null;
 
   const reset = () => {
     setCookie("");
@@ -60,6 +61,16 @@ export function QqMusicLogin() {
     setOpen(false);
     reset();
     toast.success("已退出 QQ 音乐登录");
+  };
+
+  const handleCopyCookie = async () => {
+    const ok = await writeClipboardText(useQqStore.getState().cookie);
+    if (ok) {
+      toast.success("已复制 Cookie");
+      setOpen(false);
+    } else {
+      toast.error("复制失败");
+    }
   };
 
   return (
@@ -110,14 +121,24 @@ export function QqMusicLogin() {
 
           <div className="space-y-4 px-6 pb-8">
             {user ? (
-              <Button
-                variant="destructive"
-                className="h-11 w-full justify-center"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                退出登录
-              </Button>
+              <div className="flex flex-col gap-3">
+                <Button
+                  variant="secondary"
+                  className="h-11 w-full justify-center"
+                  onClick={handleCopyCookie}
+                >
+                  <Copy className="mr-2 h-4 w-4" />
+                  复制 Cookie
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="h-11 w-full justify-center"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  退出登录
+                </Button>
+              </div>
             ) : (
               <>
                 <Textarea
