@@ -2,6 +2,8 @@ import { fetchWithTimeout, IS_NATIVE } from "@/lib/api/config";
 import { logger } from "@/lib/logger";
 import { CapacitorHttp } from "@capacitor/core";
 
+const IS_WEB_DEV = !IS_NATIVE && import.meta.env.MODE === "development";
+
 export interface WebdavConfig {
   url: string;
   username: string;
@@ -69,28 +71,23 @@ async function webdavRequest(
       };
     }
 
-    return await fetchWithTimeout(url, {
+    const requestUrl = IS_WEB_DEV
+      ? `/api/webdav?url=${encodeURIComponent(url)}`
+      : url;
+
+    return await fetchWithTimeout(requestUrl, {
       method,
       headers: { Authorization: authHeader(cfg), ...init.headers },
       body: init.body,
     });
   } catch (e) {
-    if (!IS_NATIVE && e instanceof TypeError) {
+    if (!IS_NATIVE && !IS_WEB_DEV && e instanceof TypeError) {
       logger.error("webdav", "CORS blocked", e, { url });
       throw new Error(
         "当前 WebDAV 服务不支持浏览器跨域访问，请在 Android 端使用"
       );
     }
     throw e;
-  }
-}
-
-/** 确保目录存在（失败时忽略，交由上传自行报错） */
-async function ensureDirectory(cfg: WebdavConfig): Promise<void> {
-  try {
-    await webdavRequest(cfg, "MKCOL", "");
-  } catch {
-    // 目录已存在(405)或服务器不支持 MKCOL，忽略
   }
 }
 
@@ -112,7 +109,6 @@ export async function uploadBackup(
   cfg: WebdavConfig,
   json: string
 ): Promise<void> {
-  await ensureDirectory(cfg);
   const res = await webdavRequest(cfg, "PUT", BACKUP_FILENAME, {
     headers: { "Content-Type": "application/json" },
     body: json,

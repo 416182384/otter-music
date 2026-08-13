@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { fetchWithTimeout } = vi.hoisted(() => ({
   fetchWithTimeout: vi.fn(),
@@ -34,6 +34,10 @@ function mockResponse(status: number, text = "") {
 }
 
 describe("webdav client", () => {
+  beforeEach(() => {
+    fetchWithTimeout.mockClear();
+  });
+
   it("normalizes trailing slashes", () => {
     expect(normalizeUrl("https://dav.example.com/backup/")).toBe(
       "https://dav.example.com/backup"
@@ -61,11 +65,11 @@ describe("webdav client", () => {
   });
 
   it("uploads backup via PUT with json body", async () => {
-    fetchWithTimeout.mockResolvedValueOnce(mockResponse(405)); // MKCOL 已存在
     fetchWithTimeout.mockResolvedValueOnce(mockResponse(201));
     await expect(uploadBackup(cfg, '{"a":1}')).resolves.toBeUndefined();
 
-    expect(fetchWithTimeout).toHaveBeenLastCalledWith(
+    expect(fetchWithTimeout).toHaveBeenCalledTimes(1);
+    expect(fetchWithTimeout).toHaveBeenCalledWith(
       "https://dav.example.com/backup/otter-music-backup.json",
       expect.objectContaining({ method: "PUT", body: '{"a":1}' })
     );

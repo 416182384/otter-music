@@ -209,7 +209,7 @@ export function WebDavBackup() {
                 disabled={!currentConfig || uploading || downloading}
               >
                 <Download className="h-4 w-4" />
-                {downloading ? "恢复中..." : "下载恢复"}
+                {downloading ? "下载中..." : "下载备份"}
               </Button>
             </div>
           </div>
