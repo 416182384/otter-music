@@ -120,7 +120,8 @@ export function convertQqSearchSongToMusicTrack(
  */
 export function buildVkeyRequestBody(
   songmid: string,
-  qualityKeys: readonly string[]
+  qualityKeys: readonly string[],
+  uin = "0"
 ) {
   const filenames = qualityKeys
     .map((key) => {
@@ -138,14 +139,14 @@ export function buildVkeyRequestBody(
         guid: "10000",
         songmid: qualityKeys.map(() => songmid),
         songtype: qualityKeys.map(() => 0),
-        uin: "0",
+        uin,
         loginflag: 1,
         platform: "20",
       },
     },
-    loginUin: "0",
+    loginUin: uin,
     comm: {
-      uin: "0",
+      uin,
       format: "json",
       ct: 24,
       cv: 0,

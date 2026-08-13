@@ -16,6 +16,7 @@ import {
   parseQqPlaylistResponse,
 } from "@otter-music/shared";
 import { IS_NATIVE, IS_WEB_PROD, getApiUrl } from "@/lib/api/config";
+import { useQqStore } from "@/store/qq-store";
 
 const QQ_PROXY_PREFIX = "/music-api/qqmusic";
 const NETWORK_TIMEOUT = 12000;
@@ -262,6 +263,13 @@ export async function getQqMusicUrl(
 
   if (IS_NATIVE) {
     const { CapacitorHttp } = await import("@capacitor/core");
+    const { cookie, user } = useQqStore.getState();
+    const authenticatedUin = cookie && user?.uin ? user.uin : "0";
+    const authenticatedBody = buildVkeyRequestBody(
+      songmid,
+      qualityKeys,
+      authenticatedUin
+    );
     const res = await CapacitorHttp.request({
       method: "POST",
       url: QQ_API_URL,
@@ -269,8 +277,9 @@ export async function getQqMusicUrl(
         "Content-Type": "application/json",
         Referer: QQ_REFERER,
         "User-Agent": QQ_USER_AGENT,
+        ...(cookie ? { Cookie: cookie } : {}),
       },
-      data: JSON.stringify(body),
+      data: JSON.stringify(authenticatedBody),
     });
     if (res.status >= 400) return null;
     const data =
