@@ -93,9 +93,9 @@ async function webdavRequest(
 
 /** 测试连接：校验凭据与目录可达性 */
 export async function testConnection(cfg: WebdavConfig): Promise<void> {
-  const res = await webdavRequest(cfg, "PROPFIND", "", {
-    headers: { Depth: "0" },
-  });
+  // CapacitorHttp only supports standard HTTP methods; OPTIONS also verifies
+  // that the configured WebDAV endpoint is reachable and accepts credentials.
+  const res = await webdavRequest(cfg, "OPTIONS", "");
   if (res.status === 401 || res.status === 403) {
     throw new Error("认证失败，请检查用户名和密码");
   }

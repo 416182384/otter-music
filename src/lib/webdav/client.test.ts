@@ -59,6 +59,16 @@ describe("webdav client", () => {
     await expect(testConnection(cfg)).rejects.toThrow("认证失败");
   });
 
+  it("tests the connection with OPTIONS", async () => {
+    fetchWithTimeout.mockResolvedValueOnce(mockResponse(204));
+    await expect(testConnection(cfg)).resolves.toBeUndefined();
+
+    expect(fetchWithTimeout).toHaveBeenCalledWith(
+      "https://dav.example.com/backup/",
+      expect.objectContaining({ method: "OPTIONS" })
+    );
+  });
+
   it("rejects a missing directory in testConnection", async () => {
     fetchWithTimeout.mockResolvedValueOnce(mockResponse(404));
     await expect(testConnection(cfg)).rejects.toThrow("连接失败，HTTP 404");

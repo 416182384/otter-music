@@ -8,18 +8,25 @@ import {
   Trash2,
   Upload,
   Download,
+  MoreHorizontal,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "../ui/drawer";
 import { Input } from "../ui/input";
 import { SettingItem } from "./SettingItem";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { useWebdavStore } from "@/store/webdav-store";
 import { toastUtils } from "@/lib/utils/toast";
 import {
@@ -183,16 +190,6 @@ export function WebDavBackup() {
               onChange={(e) => setInputPassword(e.target.value)}
             />
 
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleTest}
-              disabled={!currentConfig || testing}
-            >
-              <Wifi className="h-4 w-4" />
-              {testing ? "测试中..." : "测试连接"}
-            </Button>
-
             <div className="flex gap-2">
               <Button
                 onClick={handleUpload}
@@ -202,38 +199,59 @@ export function WebDavBackup() {
                 <Upload className="h-4 w-4" />
                 {uploading ? "上传中..." : "上传备份"}
               </Button>
+
               <Button
-                onClick={handleDownload}
-                className="flex-1"
+                onClick={handleSave}
                 variant="outline"
-                disabled={!currentConfig || uploading || downloading}
+                className="flex-1"
+                disabled={!currentConfig}
               >
-                <Download className="h-4 w-4" />
-                {downloading ? "下载中..." : "下载备份"}
+                <Save className="h-4 w-4" />
+                保存配置
               </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    title="更多操作"
+                    disabled={uploading || downloading || testing}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    disabled={!currentConfig || testing}
+                    onSelect={() => void handleTest()}
+                  >
+                    <Wifi />
+                    {testing ? "测试中..." : "测试连接"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!currentConfig || uploading || downloading}
+                    onSelect={() => void handleDownload()}
+                  >
+                    <Download />
+                    {downloading ? "下载中..." : "下载备份"}
+                  </DropdownMenuItem>
+                  {url && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onSelect={handleClear}
+                      >
+                        <Trash2 />
+                        清除配置
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-
-          <DrawerFooter className="gap-2 pt-0">
-            {url && (
-              <Button
-                variant="outline"
-                onClick={handleClear}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                清除配置
-              </Button>
-            )}
-            <Button
-              onClick={handleSave}
-              disabled={!currentConfig}
-              className="h-11"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              保存配置
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>
