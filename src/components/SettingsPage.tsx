@@ -45,6 +45,7 @@ import { PlaybackSpeedSetting } from "./settings/PlaybackSpeedSetting";
 import { AutoMatchSuffixSetting } from "./settings/AutoMatchSuffixSetting";
 import { AutoMatchSetting } from "./settings/AutoMatchSetting";
 import { DataBackup } from "./settings/DataBackup";
+import { WebDavBackup } from "./settings/WebDavBackup";
 import { useState } from "react";
 
 interface SettingsPageProps {
@@ -221,6 +222,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
           />
           <AutoMatchSetting />
           <StreamCacheSetting />
+          <WebDavBackup />
         </SettingsSection>
 
         <SettingsSection title="关于系统">

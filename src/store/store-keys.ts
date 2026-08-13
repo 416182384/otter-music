@@ -12,4 +12,5 @@ export enum storeKey {
   QqStore = "oh_qq_store",
   OfflineStore = "oh_offline_store",
   UrlCacheStore = "oh_url_cache_store",
+  WebdavStore = "oh_webdav_store",
 }
