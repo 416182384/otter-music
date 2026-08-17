@@ -89,7 +89,13 @@ export function useAudioEventHandlers(
         syncPositionState(0);
         const state = getMusicState();
 
-        if (state.isRepeat) {
+        if (state.sleepTimerStopAfterCurrentTrack) {
+          state.setIsPlaying(false);
+          state.setSleepTimerIsActive(false);
+          state.setSleepTimerStopAfterCurrentTrack(false);
+          state.setSleepTimerRemaining(0);
+          state.setSleepTimerEndTime(0);
+        } else if (state.isRepeat) {
           audio.currentTime = 0;
           audio.play().catch(() => state.setIsPlaying(false));
         } else if (state.queue.length) {
