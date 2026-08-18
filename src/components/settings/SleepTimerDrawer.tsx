@@ -118,16 +118,6 @@ export function SleepTimerDrawer({
           />
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>1分钟</span>
-            {!isActive && (
-              <Button
-                variant="ghost"
-                size="xs"
-                className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
-                onClick={handleStopAfterCurrentTrack}
-              >
-                播完当前歌曲
-              </Button>
-            )}
             <span>120分钟</span>
           </div>
         </div>
@@ -143,9 +133,18 @@ export function SleepTimerDrawer({
               {!stopAfterCurrentTrack && `（剩余 ${formatTime(remaining)}）`}
             </Button>
           ) : (
-            <Button className="w-full" onClick={handleStart}>
-              开启定时关闭
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleStopAfterCurrentTrack}
+              >
+                播完当前歌曲
+              </Button>
+              <Button className="w-full" onClick={handleStart}>
+                开启定时关闭
+              </Button>
+            </>
           )}
         </DrawerFooter>
       </DrawerContent>
