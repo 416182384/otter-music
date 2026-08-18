@@ -18,6 +18,7 @@ public class MainActivity extends BridgeActivity {
         }
         registerPlugin(LocalMusicPlugin.class);
         registerPlugin(BilibiliProxyPlugin.class);
+        registerPlugin(AudioRoutePlugin.class);
         super.onCreate(savedInstanceState);
     }
 
