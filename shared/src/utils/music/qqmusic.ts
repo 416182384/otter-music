@@ -174,16 +174,22 @@ export function buildVkeyRequestBody(
 }
 
 /**
- * 从 vkey 响应中提取可用音频 URL，返回第一个 purl 非空的链接
+ * 从 vkey 响应中提取可用音频 URL，返回第一个 purl 非空的链接。
+ * 优先选用 https 镜像；若仅有 http 镜像则强制升级为 https，
+ * 避免 Android WebView 明文流媒体缓冲不稳/被运营商干扰。
  */
 export function extractVkeyUrl(data: QqVkeyResponse): string | null {
   const sip = data.req_1?.data?.sip;
   const midurlinfo = data.req_1?.data?.midurlinfo;
   if (!sip?.length || !midurlinfo?.length) return null;
 
+  const base =
+    sip.find((s) => s.startsWith("https://")) ||
+    sip[0].replace(/^http:\/\//i, "https://");
+
   for (const info of midurlinfo) {
     if (info.purl) {
-      return sip[0] + info.purl;
+      return base + info.purl;
     }
   }
   return null;

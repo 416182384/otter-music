@@ -1,9 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
   buildVkeyRequestBody,
+  extractVkeyUrl,
   orderQqQualityKeys,
   qqBrToQualityKey,
 } from "./qqmusic";
+import type { QqVkeyResponse } from "../../types/music-platforms";
+
+function buildVkeyResponse(
+  sip: string[],
+  midurlinfo: { purl: string; filename: string }[]
+): QqVkeyResponse {
+  return { req_1: { code: 0, data: { sip, midurlinfo } } };
+}
 
 describe("buildVkeyRequestBody", () => {
   it("uses anonymous credentials by default", () => {
@@ -46,5 +55,62 @@ describe("orderQqQualityKeys", () => {
 
   it("returns the default order when preferred is unknown", () => {
     expect(orderQqQualityKeys("flac")).toEqual(["320k", "128k", "m4a"]);
+  });
+});
+
+describe("extractVkeyUrl", () => {
+  const purlInfo = [
+    {
+      purl: "C400songmid.m4a?guid=10000&key=vkey&uin=0",
+      filename: "C400songmid.m4a",
+    },
+  ];
+
+  it("returns the first non-empty purl joined with the base sip", () => {
+    const data = buildVkeyResponse(
+      ["https://ws.stream.qqmusic.qq.com/"],
+      purlInfo
+    );
+    expect(extractVkeyUrl(data)).toBe(
+      "https://ws.stream.qqmusic.qq.com/C400songmid.m4a?guid=10000&key=vkey&uin=0"
+    );
+  });
+
+  it("prefers the https mirror over http mirrors", () => {
+    const data = buildVkeyResponse(
+      ["http://ws.stream.qqmusic.qq.com/", "https://ws.stream.qqmusic.qq.com/"],
+      purlInfo
+    );
+    expect(extractVkeyUrl(data)?.startsWith("https://")).toBe(true);
+  });
+
+  it("upgrades an http mirror to https when no https mirror exists", () => {
+    const data = buildVkeyResponse(
+      ["http://ws.stream.qqmusic.qq.com/"],
+      purlInfo
+    );
+    expect(extractVkeyUrl(data)).toBe(
+      "https://ws.stream.qqmusic.qq.com/C400songmid.m4a?guid=10000&key=vkey&uin=0"
+    );
+  });
+
+  it("skips empty purls and returns null when none is playable", () => {
+    const data = buildVkeyResponse(
+      ["http://ws.stream.qqmusic.qq.com/"],
+      [
+        { purl: "", filename: "C400a.m4a" },
+        { purl: "", filename: "M500a.mp3" },
+      ]
+    );
+    expect(extractVkeyUrl(data)).toBeNull();
+  });
+
+  it("returns null when sip or midurlinfo is missing", () => {
+    expect(extractVkeyUrl(buildVkeyResponse([], purlInfo))).toBeNull();
+    expect(
+      extractVkeyUrl(
+        buildVkeyResponse(["http://ws.stream.qqmusic.qq.com/"], [])
+      )
+    ).toBeNull();
   });
 });
