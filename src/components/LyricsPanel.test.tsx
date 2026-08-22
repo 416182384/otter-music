@@ -16,6 +16,9 @@ vi.mock("@/store/music-store", () => ({
     currentAudioTime: 0,
     seek: vi.fn(),
     seekTimestamp: 0,
+    lyricAlign: "center",
+    lyricFontSize: 18,
+    lyricOffset: -0.5,
   })),
 }));
 

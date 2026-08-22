@@ -7,6 +7,7 @@ import {
 } from "@/types/music";
 
 export type FullScreenBackgroundMode = "theme" | "cover" | "texture";
+export type LyricAlign = "center" | "left" | "right";
 
 export interface AutoMatchContext {
   index: number;
@@ -29,6 +30,9 @@ export interface UiSlice {
   bilibiliAutoMatchSuffix: string;
   fullScreenBackgroundMode: FullScreenBackgroundMode;
   showSourceBadge: boolean;
+  lyricAlign: LyricAlign;
+  lyricFontSize: number;
+  lyricOffset: number;
   playbackSpeed: number;
   isFullScreenPlayer: boolean;
   setQuality: (quality: string) => void;
@@ -48,6 +52,9 @@ export interface UiSlice {
   setBilibiliAutoMatchSuffix: (suffix: string) => void;
   setFullScreenBackgroundMode: (mode: FullScreenBackgroundMode) => void;
   setShowSourceBadge: (show: boolean) => void;
+  setLyricAlign: (align: LyricAlign) => void;
+  setLyricFontSize: (size: number) => void;
+  setLyricOffset: (offset: number) => void;
   setPlaybackSpeed: (speed: number) => void;
   setIsFullScreenPlayer: (isFullScreen: boolean) => void;
 }
@@ -70,6 +77,9 @@ export const createUiSlice: StateCreator<MusicState, [], [], UiSlice> = (
   bilibiliAutoMatchSuffix: "高音质 原曲",
   fullScreenBackgroundMode: "theme",
   showSourceBadge: true,
+  lyricAlign: "center",
+  lyricFontSize: 18,
+  lyricOffset: -0.5,
   playbackSpeed: 1.0,
   isFullScreenPlayer: false,
   setQuality: (quality) => set({ quality }),
@@ -91,6 +101,9 @@ export const createUiSlice: StateCreator<MusicState, [], [], UiSlice> = (
   setFullScreenBackgroundMode: (fullScreenBackgroundMode) =>
     set({ fullScreenBackgroundMode }),
   setShowSourceBadge: (showSourceBadge) => set({ showSourceBadge }),
+  setLyricAlign: (lyricAlign) => set({ lyricAlign }),
+  setLyricFontSize: (lyricFontSize) => set({ lyricFontSize }),
+  setLyricOffset: (lyricOffset) => set({ lyricOffset }),
   setPlaybackSpeed: (playbackSpeed) => set({ playbackSpeed }),
   setIsFullScreenPlayer: (isFullScreenPlayer) => set({ isFullScreenPlayer }),
 });

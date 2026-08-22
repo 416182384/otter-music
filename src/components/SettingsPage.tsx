@@ -47,6 +47,7 @@ import { AutoMatchSuffixSetting } from "./settings/AutoMatchSuffixSetting";
 import { AutoMatchSetting } from "./settings/AutoMatchSetting";
 import { DataBackup } from "./settings/DataBackup";
 import { WebDavBackup } from "./settings/WebDavBackup";
+import { LyricStyleSetting } from "./settings/LyricStyleSetting";
 import { useState } from "react";
 
 interface SettingsPageProps {
@@ -170,6 +171,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
               </Select>
             }
           />
+          <LyricStyleSetting />
         </SettingsSection>
 
         <SettingsSection title="账号数据">
