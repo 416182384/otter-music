@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { SettingItem } from "./SettingItem";
 import { IS_NATIVE } from "@/lib/api/config";
-import { BilibiliLogin as BilibiliLoginPlugin } from "@/plugins/bilibili-login";
+import { openBilibiliLogin, clearBilibiliCookies } from "@/plugins/webview-login";
 import { getBilibiliUserByCookie } from "@/lib/bilibili/bilibili-auth";
 import { useBilibiliStore } from "@/store/bilibili-store";
 import { writeClipboardText } from "@/lib/clipboard";
@@ -27,7 +27,7 @@ export function BilibiliLogin() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const result = await BilibiliLoginPlugin.openLogin();
+      const result = await openBilibiliLogin();
       if (!result?.cookie) return;
 
       const profile = await getBilibiliUserByCookie(result.cookie);
@@ -47,6 +47,8 @@ export function BilibiliLogin() {
 
   const handleLogout = () => {
     if (!window.confirm("确定要退出 B 站登录吗？")) return;
+    // 后台清除残留 cookie，不阻塞退出流程
+    clearBilibiliCookies().catch(() => {});
     logout();
     setOpen(false);
     toast.success("已退出 B 站登录");
