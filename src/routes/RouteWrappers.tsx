@@ -59,6 +59,11 @@ const BilibiliCollectionDetail = lazy(() =>
     default: m.BilibiliCollectionDetail,
   }))
 );
+const BilibiliArtistDetail = lazy(() =>
+  import("@/components/BilibiliArtistDetail").then((m) => ({
+    default: m.BilibiliArtistDetail,
+  }))
+);
 const AlistBrowser = lazy(() =>
   import("@/components/PlaylistMarket/Alist/AlistBrowser").then((m) => ({
     default: m.AlistBrowser,
@@ -311,6 +316,23 @@ export const BilibiliCollectionDetailRoute = withSuspense(() => {
       id={id || null}
       onBack={() => navigate(-1)}
       onPlay={(track, list) => handlePlay(track, list, "bilibili_collection")}
+      currentTrackId={currentTrackId}
+      isPlaying={isPlaying}
+    />
+  );
+});
+
+export const BilibiliArtistDetailRoute = withSuspense(() => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { handlePlay } = usePlayHelper();
+  const { currentTrackId, isPlaying } = usePlaybackState();
+
+  return (
+    <BilibiliArtistDetail
+      id={id || null}
+      onBack={() => navigate(-1)}
+      onPlay={(track, list) => handlePlay(track, list, "bilibili_artist")}
       currentTrackId={currentTrackId}
       isPlaying={isPlaying}
     />

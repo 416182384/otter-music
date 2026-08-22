@@ -9,4 +9,5 @@ export * from "./sync-store";
 export * from "./app-store";
 export * from "./netease-store";
 export * from "./qq-store";
+export * from "./bilibili-store";
 export * from "./offline-store";

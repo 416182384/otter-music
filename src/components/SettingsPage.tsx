@@ -8,6 +8,7 @@ import { AggregatedSourceSelect } from "./settings/AggregatedSourceSelect";
 import { SyncConfig } from "./settings/SyncConfig";
 import { NeteaseLogin } from "./settings/NeteaseLogin";
 import { QqMusicLogin } from "./settings/QqMusicLogin";
+import { BilibiliLogin } from "./settings/BilibiliLogin";
 import { ApiUrlConfig } from "./settings/ApiUrlConfig";
 import {
   useMusicStore,
@@ -174,6 +175,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
         <SettingsSection title="账号数据">
           <NeteaseLogin />
           <QqMusicLogin />
+          <BilibiliLogin />
           <SyncConfig />
           <SettingItem
             icon={Database}
