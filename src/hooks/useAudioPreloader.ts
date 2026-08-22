@@ -72,8 +72,13 @@ export function useAudioPreloader(
 
           if (!url) return;
 
-          // 预热 SW 缓存（no-cors 避免跨域问题）
-          await fetch(url, { mode: "no-cors" });
+          // QQ 会话绑定且无法在浏览器侧带鉴权：仅解析 URL（写入内存缓存
+          // 供切歌快速起播），不执行 no-cors 预热，避免坏响应写进 SW
+          // 缓存、复用旧 vkey 导致切歌换源
+          if (nextTrack.source !== "qq") {
+            // 预热 SW 缓存（no-cors 避免跨域问题）
+            await fetch(url, { mode: "no-cors" });
+          }
 
           // 标记已预加载
           preloadedKeyRef.current = preloadKey;
