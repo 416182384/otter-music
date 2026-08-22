@@ -4,7 +4,6 @@ import {
   type QqSearchResponse,
   type QqVkeyResponse,
   QQ_API_URL,
-  QQ_FILE_CONFIG,
   QQ_LYRIC_URL,
   QQ_REFERER,
   buildQqPlaylistApiPath,
@@ -13,7 +12,9 @@ import {
   convertQqSongToMusicTrack,
   decodeQqHtmlEntities,
   extractVkeyUrl,
+  orderQqQualityKeys,
   parseQqPlaylistResponse,
+  qqBrToQualityKey,
 } from "@otter-music/shared";
 import { IS_NATIVE, IS_WEB_PROD, getApiUrl } from "@/lib/api/config";
 import { useQqStore } from "@/store/qq-store";
@@ -242,16 +243,17 @@ export async function searchQqMusic(
 
 /**
  * 通过 QQ 音乐 vkey API 获取音频直链。
- * 支持质量降级：320k → 128k → m4a，不可播放时返回 null。
+ * 根据目标码率 br 选择首选质量（QQ 无 192 档，就近降级；320k 封顶），
+ * 请求内按优先级降级，不可播放时返回 null。
  * - Web 生产: 走 Worker 代理
  * - 原生: 直连 u.y.qq.com
  * - 开发: 走 Vite 代理
  */
 export async function getQqMusicUrl(
   songmid: string,
-  _br?: number
+  br = 320
 ): Promise<string | null> {
-  const qualityKeys = QQ_FILE_CONFIG.map((c) => c.key);
+  const qualityKeys = orderQqQualityKeys(qqBrToQualityKey(br));
 
   if (IS_WEB_PROD) {
     const apiUrl = getApiUrl();
@@ -292,14 +294,6 @@ export async function getQqMusicUrl(
         : (res.data as QqVkeyResponse);
     const directUrl = extractVkeyUrl(data);
     if (!directUrl) return null;
-
-    // 原生环境把音频直链包进本地代理，注入 Referer/Cookie/UA，
-    // 解决直连 QQ CDN 时鉴权失败导致的无限加载/换源问题。
-    if (cookie) {
-      const { getNativeQqStreamUrl } = await import("./qqmusic-proxy");
-      const proxy = await getNativeQqStreamUrl(directUrl, cookie);
-      if (proxy) return proxy;
-    }
     return directUrl;
   }
 

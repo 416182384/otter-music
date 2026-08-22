@@ -23,6 +23,25 @@ export const QQ_FILE_CONFIG = [
   { key: "m4a", prefix: "C400", ext: ".m4a" },
 ] as const;
 
+/**
+ * 将全局音质档位 (br, kbps) 映射为 QQ 首选质量键。
+ * QQ 无 192 档，就近降到 128k；最高 320k 封顶。
+ */
+export function qqBrToQualityKey(br = 320): string {
+  return br < 320 ? "128k" : "320k";
+}
+
+/**
+ * 按首选质量键返回优先级排列的质量键列表（用于 vkey 请求降级）。
+ * 首选键无效时回退默认顺序。
+ */
+export function orderQqQualityKeys(preferred: string): string[] {
+  const all = QQ_FILE_CONFIG.map((c) => c.key) as string[];
+  return all.includes(preferred)
+    ? [preferred, ...all.filter((k) => k !== preferred)]
+    : all;
+}
+
 // ─────────────────────────────────────
 // 歌单
 // ─────────────────────────────────────
