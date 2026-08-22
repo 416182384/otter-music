@@ -31,6 +31,15 @@ function isTrackPlayable(
   return Boolean(useOfflineStore.getState().records?.[track.id]);
 }
 
+/**
+ * 判断是否为网络层加载失败（MEDIA_ERR_NETWORK == 2）。
+ * 鉴权/格式类失败（DECODE、SRC_NOT_SUPPORTED）不代表直连不可达，
+ * 不应触发代理回退（否则会掩盖真实原因且回退也无效）。
+ */
+function isNetworkMediaError(err: unknown): boolean {
+  return (err as { mediaErrorCode?: number | null })?.mediaErrorCode === 2;
+}
+
 /** 查找队列中下一首可播歌曲 */
 function findNextPlayableTrack(
   queue: { source: MusicSource; id: string }[],
@@ -227,9 +236,10 @@ export function useAudioTrackLoader(
             return;
           }
 
-          // 代理备用线路容灾
+          // 代理备用线路容灾（仅网络层失败才回退，鉴权/格式类失败不走）
           if (
             getState().enableProxyFallback &&
+            isNetworkMediaError(err) &&
             source !== "local" &&
             fallbackStageRef.current.stage === "none" &&
             remoteUrlRef.current &&
