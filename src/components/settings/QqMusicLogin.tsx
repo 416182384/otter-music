@@ -140,30 +140,51 @@ export function QqMusicLogin() {
                 </Button>
               </div>
             ) : (
-              <>
-                <Textarea
-                  value={cookie}
-                  onChange={(event) => setCookie(event.target.value)}
-                  placeholder="粘贴 Cookie: uin=...; qm_keyst=..."
-                  className="h-36 resize-none font-mono text-xs"
-                />
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  请先在 QQ 音乐官网登录，再从浏览器开发者工具的 Cookies
-                  中复制完整 Cookie。凭证仅保存在本地。
-                </p>
-                <Button
-                  className="w-full"
-                  onClick={handleLogin}
-                  disabled={loading || !cookie.trim()}
-                >
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  验证并登录
-                </Button>
-              </>
+              <ManualCookieInput
+                cookie={cookie}
+                loading={loading}
+                onChange={setCookie}
+                onSubmit={handleLogin}
+              />
             )}
           </div>
         </DrawerContent>
       </Drawer>
+    </>
+  );
+}
+
+function ManualCookieInput({
+  cookie,
+  loading,
+  onChange,
+  onSubmit,
+}: {
+  cookie: string;
+  loading: boolean;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <>
+      <Textarea
+        value={cookie}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="粘贴 Cookie: uin=...; qm_keyst=..."
+        className="h-36 resize-none font-mono text-xs"
+      />
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        请先在 QQ 音乐官网登录，再从浏览器开发者工具的 Cookies 中复制完整
+        Cookie。凭证仅保存在本地。
+      </p>
+      <Button
+        className="w-full"
+        onClick={onSubmit}
+        disabled={loading || !cookie.trim()}
+      >
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        验证并登录
+      </Button>
     </>
   );
 }

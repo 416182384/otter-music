@@ -8,6 +8,7 @@ import { checkAndSync } from "@/lib/sync";
 import { cleanupCache } from "@/lib/utils/cache";
 import { revokeAll } from "@/lib/utils/blob-registry";
 import { stopBilibiliProxyServer } from "@/lib/bilibili/bilibili-native-player";
+import { stopQqProxyServer } from "@/lib/qqmusic/qqmusic-proxy";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 export default function App() {
@@ -55,6 +56,7 @@ export default function App() {
       if (!isActive) {
         // 应用进入后台，停止代理服务器节省资源
         stopBilibiliProxyServer();
+        stopQqProxyServer();
       }
     };
 
@@ -62,6 +64,7 @@ export default function App() {
     const handlePause = () => {
       // 应用暂停时停止代理服务器
       stopBilibiliProxyServer();
+      stopQqProxyServer();
     };
 
     // 应用恢复监听
@@ -76,6 +79,7 @@ export default function App() {
     return () => {
       CapacitorApp.removeAllListeners();
       stopBilibiliProxyServer();
+      stopQqProxyServer();
     };
   }, []);
 

@@ -480,13 +480,18 @@ export default defineConfig({
           Origin: "https://y.qq.com",
         },
         configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
             proxyReq.setHeader("Referer", "https://y.qq.com/");
             proxyReq.setHeader("Origin", "https://y.qq.com");
+            proxyReq.setHeader(
+              "Cookie",
+              req.headers["x-real-cookie"] || "uin="
+            );
             proxyReq.setHeader(
               "User-Agent",
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             );
+            proxyReq.removeHeader("x-real-cookie");
           });
         },
       },

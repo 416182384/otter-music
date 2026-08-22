@@ -170,6 +170,7 @@ export async function searchQqMusic(
 
   if (IS_NATIVE) {
     const { CapacitorHttp } = await import("@capacitor/core");
+    const { cookie } = useQqStore.getState();
     const res = await CapacitorHttp.request({
       method: "POST",
       url: QQ_API_URL,
@@ -177,7 +178,7 @@ export async function searchQqMusic(
         "Content-Type": "application/json",
         Referer: QQ_REFERER,
         "User-Agent": QQ_USER_AGENT,
-        Cookie: "uin=",
+        Cookie: cookie || "uin=",
       },
       data: JSON.stringify({
         req_1: {
@@ -206,9 +207,13 @@ export async function searchQqMusic(
   }
 
   // dev
+  const { cookie } = useQqStore.getState();
   const res = await fetchWithTimeout(`/api/qqmusic-search/cgi-bin/musicu.fcg`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(cookie ? { "X-Real-Cookie": cookie } : {}),
+    },
     body: JSON.stringify({
       req_1: {
         method: "DoSearchForQQMusicDesktop",
@@ -247,7 +252,6 @@ export async function getQqMusicUrl(
   _br?: number
 ): Promise<string | null> {
   const qualityKeys = QQ_FILE_CONFIG.map((c) => c.key);
-  const body = buildVkeyRequestBody(songmid, qualityKeys);
 
   if (IS_WEB_PROD) {
     const apiUrl = getApiUrl();
@@ -286,15 +290,31 @@ export async function getQqMusicUrl(
       typeof res.data === "string"
         ? (JSON.parse(res.data) as QqVkeyResponse)
         : (res.data as QqVkeyResponse);
-    return extractVkeyUrl(data);
+    const directUrl = extractVkeyUrl(data);
+    if (!directUrl) return null;
+
+    // 原生环境把音频直链包进本地代理，注入 Referer/Cookie/UA，
+    // 解决直连 QQ CDN 时鉴权失败导致的无限加载/换源问题。
+    if (cookie) {
+      const { getNativeQqStreamUrl } = await import("./qqmusic-proxy");
+      const proxy = await getNativeQqStreamUrl(directUrl, cookie);
+      if (proxy) return proxy;
+    }
+    return directUrl;
   }
 
   // dev
+  const { cookie, user } = useQqStore.getState();
+  const uin = cookie && user?.uin ? user.uin : "0";
+  const authenticatedBody = buildVkeyRequestBody(songmid, qualityKeys, uin);
   try {
     const res = await fetchWithTimeout(`/api/qqmusic-url/cgi-bin/musicu.fcg`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        ...(cookie ? { "X-Real-Cookie": cookie } : {}),
+      },
+      body: JSON.stringify(authenticatedBody),
     });
     if (!res.ok) return null;
     const data = (await res.json()) as QqVkeyResponse;
