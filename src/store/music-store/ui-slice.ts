@@ -21,6 +21,7 @@ export interface UiSlice {
   lastPlaylistCategory: string;
   lastMineTab: "recommend" | "created" | "subscribed" | "albums";
   lastFeaturedTab: string;
+  lastBillboardGroup: "songs" | "albums" | "artists";
   enableAutoMatch: boolean;
   autoMatchFavorites: boolean;
   autoMatchPlaylists: boolean;
@@ -43,6 +44,7 @@ export interface UiSlice {
     tab: "recommend" | "created" | "subscribed" | "albums"
   ) => void;
   setLastFeaturedTab: (tab: string) => void;
+  setLastBillboardGroup: (group: "songs" | "albums" | "artists") => void;
   setEnableAutoMatch: (enable: boolean) => void;
   setAutoMatchFavorites: (enable: boolean) => void;
   setAutoMatchPlaylists: (enable: boolean) => void;
@@ -68,6 +70,7 @@ export const createUiSlice: StateCreator<MusicState, [], [], UiSlice> = (
   lastPlaylistCategory: "全部",
   lastMineTab: "recommend",
   lastFeaturedTab: "",
+  lastBillboardGroup: "songs",
   enableAutoMatch: true,
   autoMatchFavorites: false,
   autoMatchPlaylists: true,
@@ -89,6 +92,7 @@ export const createUiSlice: StateCreator<MusicState, [], [], UiSlice> = (
     set({ lastPlaylistCategory }),
   setLastMineTab: (lastMineTab) => set({ lastMineTab }),
   setLastFeaturedTab: (lastFeaturedTab) => set({ lastFeaturedTab }),
+  setLastBillboardGroup: (lastBillboardGroup) => set({ lastBillboardGroup }),
   setEnableAutoMatch: (enableAutoMatch) => set({ enableAutoMatch }),
   setAutoMatchFavorites: (autoMatchFavorites) => set({ autoMatchFavorites }),
   setAutoMatchPlaylists: (autoMatchPlaylists) => set({ autoMatchPlaylists }),

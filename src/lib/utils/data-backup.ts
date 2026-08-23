@@ -81,6 +81,7 @@ interface BackupPayload {
   lastPlaylistCategory: string;
   lastMineTab: "recommend" | "created" | "subscribed" | "albums";
   lastFeaturedTab: string;
+  lastBillboardGroup: "songs" | "albums" | "artists";
   enableAutoMatch: boolean;
   autoMatchFavorites: boolean;
   autoMatchPlaylists: boolean;
@@ -145,6 +146,7 @@ export function serializeStoreData(): string {
     lastPlaylistCategory: state.lastPlaylistCategory,
     lastMineTab: state.lastMineTab,
     lastFeaturedTab: state.lastFeaturedTab,
+    lastBillboardGroup: state.lastBillboardGroup,
     enableAutoMatch: state.enableAutoMatch,
     autoMatchFavorites: state.autoMatchFavorites,
     autoMatchPlaylists: state.autoMatchPlaylists,
@@ -332,6 +334,7 @@ export function importStoreData(payload: BackupPayload): void {
     lastPlaylistCategory: payload.lastPlaylistCategory ?? "全部",
     lastMineTab: payload.lastMineTab ?? "recommend",
     lastFeaturedTab: payload.lastFeaturedTab ?? "",
+    lastBillboardGroup: payload.lastBillboardGroup ?? "songs",
     enableAutoMatch: payload.enableAutoMatch ?? true,
     autoMatchFavorites: payload.autoMatchFavorites ?? false,
     autoMatchPlaylists: payload.autoMatchPlaylists ?? true,

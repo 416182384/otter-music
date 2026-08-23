@@ -350,11 +350,7 @@ export function PlaylistImportDrawer({
 
   return (
     <Drawer open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DrawerContent
-        className={`${
-          activeTab === "link" ? "max-h-[92vh]" : "h-[40vh]"
-        } outline-none overflow-hidden flex flex-col`}
-      >
+      <DrawerContent className="max-h-[92vh] outline-none overflow-hidden flex flex-col">
         <DrawerHeader className="pb-2">
           <DrawerTitle className="text-center text-lg font-bold">
             导入歌单
@@ -441,12 +437,9 @@ export function PlaylistImportDrawer({
             )}
           </TabsContent>
 
-          <TabsContent
-            value="file"
-            className="mt-4 flex-1 min-h-0 flex flex-col"
-          >
+          <TabsContent value="file" className="mt-4">
             <div
-              className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/20 transition-colors ${
+              className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/20 transition-colors ${
                 isDragOver
                   ? "border-primary bg-primary/10"
                   : "border-muted-foreground/25"
@@ -478,10 +471,10 @@ export function PlaylistImportDrawer({
             value="text"
             className="mt-4 flex-1 min-h-0 overflow-hidden flex flex-col"
           >
-            <div className="flex-1 min-h-0 flex flex-col space-y-3">
+            <div className="flex-1 overflow-y-auto space-y-3 min-h-0">
               {/* JSON 输入区 */}
               <Textarea
-                className="flex-1 min-h-24 bg-muted/40 border-none rounded-xl focus-visible:ring-1 font-mono text-sm resize-none overflow-y-auto"
+                className="min-h-32 max-h-48 bg-muted/40 border-none rounded-xl focus-visible:ring-1 font-mono text-sm resize-none overflow-y-auto"
                 placeholder={`{\n  "name": "歌单名称",\n  "tracks": [\n    { "name": "歌名", "artist": ["歌手"] }\n  ]\n}`}
                 value={textInput}
                 onChange={(e) => {
@@ -489,7 +482,7 @@ export function PlaylistImportDrawer({
                   if (textPhase !== "input") setTextPhase("input");
                 }}
               />
-              <div className="flex items-center justify-between px-1 shrink-0">
+              <div className="flex items-center justify-between px-1">
                 <p className="text-xs text-muted-foreground">
                   将歌曲列表发送给 AI，粘贴返回的 JSON 即可导入
                 </p>
@@ -506,13 +499,13 @@ export function PlaylistImportDrawer({
 
               {/* 校验结果展示 */}
               {textPhase === "error" && (
-                <div className="text-center py-3 shrink-0">
+                <div className="text-center py-3">
                   <p className="text-sm text-destructive">{textError}</p>
                 </div>
               )}
 
               {textPhase === "preview" && textPreview && (
-                <div className="bg-muted/30 rounded-2xl p-4 flex items-center gap-4 shrink-0">
+                <div className="bg-muted/30 rounded-2xl p-4 flex items-center gap-4">
                   <div className="w-14 h-14 rounded-xl bg-muted/40 flex items-center justify-center shrink-0 flex-[0_0_56px] min-w-14 min-h-14">
                     <div className="h-6 w-6 shrink-0 flex-[0_0_24px] min-w-6 min-h-6">
                       <ListMusic

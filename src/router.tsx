@@ -18,6 +18,7 @@ import {
   BilibiliCollectionDetailRoute,
   BilibiliArtistDetailRoute,
   AlistBrowserRoute,
+  BillboardChartRoute,
 } from "@/routes/RouteWrappers";
 import { RouteErrorPage } from "@/components/RouteErrorPage";
 import { PageLoader } from "@/components/PageLoader";
@@ -85,6 +86,10 @@ export const router = createBrowserRouter([
       {
         path: "bilibili-artist/:id",
         element: <BilibiliArtistDetailRoute />,
+      },
+      {
+        path: "billboard/:chartId",
+        element: <BillboardChartRoute />,
       },
       {
         path: "queue",
