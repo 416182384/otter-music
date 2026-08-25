@@ -61,8 +61,10 @@ export async function resolveTrackUrl(
     return { url: normalizeAudioUrlForPlayback(offlineRecord.url) };
   }
 
-  // 离线无资源
-  if (!navigator.onLine) return { url: "" };
+  // 离线无资源（本地/播客音源 URL 来自磁盘，无需联网，仍继续解析）
+  if (!navigator.onLine && source !== "local" && source !== "podcast") {
+    return { url: "" };
+  }
 
   // 远端请求
   const queryId = source === "local" || source === "podcast" ? urlId : trackId;
