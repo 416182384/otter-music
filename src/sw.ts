@@ -51,15 +51,11 @@ registerRoute(
         maxAgeSeconds: 30 * 24 * 60 * 60,
       }),
       new CacheableResponsePlugin({
-        statuses: [0, 200, 206],
+        statuses: [200],
       }),
       {
         cacheWillUpdate: async ({ response }) => {
-          if (
-            response.status === 0 ||
-            response.status === 200 ||
-            response.status === 206
-          ) {
+          if (response.status === 200) {
             return response;
           }
           return null;
