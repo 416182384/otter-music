@@ -172,7 +172,7 @@ export function WebDavBackup() {
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4 space-y-3">
+          <div className="px-4 pb-4 space-y-3">
             <Input
               placeholder="服务器地址，如 https://dav.example.com/backup"
               value={inputUrl}
