@@ -10,14 +10,10 @@ import { NeteaseLogin } from "./settings/NeteaseLogin";
 import { QqMusicLogin } from "./settings/QqMusicLogin";
 import { BilibiliLogin } from "./settings/BilibiliLogin";
 import { ApiUrlConfig } from "./settings/ApiUrlConfig";
-import {
-  useMusicStore,
-  type FullScreenBackgroundMode,
-} from "@/store/music-store";
+import { useMusicStore } from "@/store/music-store";
 import { useShallow } from "zustand/react/shallow";
 import { Slider } from "./ui/slider";
 import {
-  Image,
   Palette,
   Volume2,
   Wand2,
@@ -29,13 +25,6 @@ import {
 } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { useAppStore } from "@/store/app-store";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
 import { DownloadSetting } from "./settings/DownloadSetting";
 import { SettingItem } from "./settings/SettingItem";
 import { UpdateCheck } from "./settings/UpdateCheck";
@@ -45,6 +34,7 @@ import { SleepTimerSetting } from "./settings/SleepTimerSetting";
 import { PlaybackSpeedSetting } from "./settings/PlaybackSpeedSetting";
 import { AutoMatchSuffixSetting } from "./settings/AutoMatchSuffixSetting";
 import { AutoMatchSetting } from "./settings/AutoMatchSetting";
+import { FullScreenPlayerSetting } from "./settings/FullScreenPlayerSetting";
 import { DataBackup } from "./settings/DataBackup";
 import { WebDavBackup } from "./settings/WebDavBackup";
 import { LyricStyleSetting } from "./settings/LyricStyleSetting";
@@ -85,8 +75,6 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
     setBilibiliKeepOriginalMeta,
     showSourceBadge,
     setShowSourceBadge,
-    fullScreenBackgroundMode,
-    setFullScreenBackgroundMode,
   } = useMusicStore(
     useShallow((state) => ({
       volume: state.volume,
@@ -98,8 +86,6 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
       setBilibiliKeepOriginalMeta: state.setBilibiliKeepOriginalMeta,
       showSourceBadge: state.showSourceBadge,
       setShowSourceBadge: state.setShowSourceBadge,
-      fullScreenBackgroundMode: state.fullScreenBackgroundMode,
-      setFullScreenBackgroundMode: state.setFullScreenBackgroundMode,
     }))
   );
 
@@ -150,27 +136,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
               />
             }
           />
-          <SettingItem
-            icon={Image}
-            title="全屏背景"
-            action={
-              <Select
-                value={fullScreenBackgroundMode}
-                onValueChange={(value) =>
-                  setFullScreenBackgroundMode(value as FullScreenBackgroundMode)
-                }
-              >
-                <SelectTrigger className="h-7 px-2 bg-transparent border-muted hover:bg-muted/20 w-36">
-                  <SelectValue placeholder="背景" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="theme">动态主题色</SelectItem>
-                  <SelectItem value="cover">模糊封面</SelectItem>
-                  <SelectItem value="texture">深色质感</SelectItem>
-                </SelectContent>
-              </Select>
-            }
-          />
+          <FullScreenPlayerSetting />
           <LyricStyleSetting />
         </SettingsSection>
 

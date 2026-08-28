@@ -78,6 +78,7 @@ export const useMusicStore = create<MusicState>()(
         bilibiliKeepOriginalMeta: state.bilibiliKeepOriginalMeta,
         bilibiliAutoMatchSuffix: state.bilibiliAutoMatchSuffix,
         fullScreenBackgroundMode: state.fullScreenBackgroundMode,
+        coverSize: state.coverSize,
         showSourceBadge: state.showSourceBadge,
         lyricAlign: state.lyricAlign,
         lyricFontSize: state.lyricFontSize,
