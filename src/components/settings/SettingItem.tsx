@@ -1,6 +1,6 @@
 import { LucideIcon, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 interface SettingItemProps {
   icon: LucideIcon;
@@ -27,8 +27,22 @@ export function SettingItem({
   onClick,
   children,
 }: SettingItemProps) {
+  const itemRef = useRef<HTMLDivElement>(null);
+
+  // 展开时确保整个条目（含底部滑块）完整进入可视区，
+  // 避免后续触碰滑块时浏览器自动滚动导致内容跳动、顶部被裁
+  useEffect(() => {
+    if (isExpanded) {
+      itemRef.current?.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [isExpanded]);
+
   return (
     <div
+      ref={itemRef}
       className={cn(
         "p-4 rounded-xl bg-card/50 border border-border/50 transition-colors",
         className

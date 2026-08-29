@@ -80,6 +80,7 @@ export const useMusicStore = create<MusicState>()(
         bilibiliAutoMatchSuffix: state.bilibiliAutoMatchSuffix,
         fullScreenBackgroundMode: state.fullScreenBackgroundMode,
         coverSize: state.coverSize,
+        coverRadius: state.coverRadius,
         showSourceBadge: state.showSourceBadge,
         lyricAlign: state.lyricAlign,
         lyricFontSize: state.lyricFontSize,

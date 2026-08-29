@@ -172,6 +172,7 @@ export function FullScreenPlayer({
     currentAudioUrl,
     fullScreenBackgroundMode,
     coverSize,
+    coverRadius,
     playbackSpeed,
     sleepTimerIsActive,
     sleepTimerRemaining,
@@ -196,6 +197,7 @@ export function FullScreenPlayer({
       quality: state.quality,
       fullScreenBackgroundMode: state.fullScreenBackgroundMode,
       coverSize: state.coverSize,
+      coverRadius: state.coverRadius,
       playbackSpeed: state.playbackSpeed,
       sleepTimerIsActive: state.sleepTimerIsActive,
       sleepTimerRemaining: state.sleepTimerRemaining,
@@ -319,11 +321,12 @@ export function FullScreenPlayer({
         ) : (
           <div
             className={cn(
-              "relative aspect-square max-w-[calc(100vw-16px)] overflow-hidden rounded-3xl transition-transform duration-500 ring-1 ring-white/5",
+              "relative aspect-square max-w-[calc(100vw-16px)] overflow-hidden transition-transform duration-500 ring-1 ring-white/5",
               isPlaying ? "scale-100" : "scale-[0.95]"
             )}
             style={{
               width: coverSize,
+              borderRadius: coverRadius,
               boxShadow:
                 fullScreenBackgroundMode === "theme" && hslColor
                   ? `0 30px 60px -12px hsla(${hslColor[0]}, ${

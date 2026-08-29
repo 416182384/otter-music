@@ -25,12 +25,16 @@ export function FullScreenPlayerSetting() {
     setFullScreenBackgroundMode,
     coverSize,
     setCoverSize,
+    coverRadius,
+    setCoverRadius,
   } = useMusicStore(
     useShallow((state) => ({
       fullScreenBackgroundMode: state.fullScreenBackgroundMode,
       setFullScreenBackgroundMode: state.setFullScreenBackgroundMode,
       coverSize: state.coverSize,
       setCoverSize: state.setCoverSize,
+      coverRadius: state.coverRadius,
+      setCoverRadius: state.setCoverRadius,
     }))
   );
 
@@ -86,6 +90,24 @@ export function FullScreenPlayerSetting() {
               min={240}
               max={360}
               step={8}
+            />
+          </div>
+
+          {/* 封面圆角 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">封面圆角</span>
+              <span className="text-xs tabular-nums text-muted-foreground">
+                {coverRadius}px
+              </span>
+            </div>
+
+            <Slider
+              value={[coverRadius]}
+              onValueChange={([value]) => setCoverRadius(value)}
+              min={0}
+              max={180}
+              step={3}
             />
           </div>
         </div>

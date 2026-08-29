@@ -31,6 +31,7 @@ export interface UiSlice {
   bilibiliAutoMatchSuffix: string;
   fullScreenBackgroundMode: FullScreenBackgroundMode;
   coverSize: number;
+  coverRadius: number;
   showSourceBadge: boolean;
   lyricAlign: LyricAlign;
   lyricFontSize: number;
@@ -55,6 +56,7 @@ export interface UiSlice {
   setBilibiliAutoMatchSuffix: (suffix: string) => void;
   setFullScreenBackgroundMode: (mode: FullScreenBackgroundMode) => void;
   setCoverSize: (size: number) => void;
+  setCoverRadius: (radius: number) => void;
   setShowSourceBadge: (show: boolean) => void;
   setLyricAlign: (align: LyricAlign) => void;
   setLyricFontSize: (size: number) => void;
@@ -82,6 +84,7 @@ export const createUiSlice: StateCreator<MusicState, [], [], UiSlice> = (
   bilibiliAutoMatchSuffix: "高音质 原曲",
   fullScreenBackgroundMode: "theme",
   coverSize: 288,
+  coverRadius: 24,
   showSourceBadge: true,
   lyricAlign: "center",
   lyricFontSize: 18,
@@ -108,6 +111,7 @@ export const createUiSlice: StateCreator<MusicState, [], [], UiSlice> = (
   setFullScreenBackgroundMode: (fullScreenBackgroundMode) =>
     set({ fullScreenBackgroundMode }),
   setCoverSize: (coverSize) => set({ coverSize }),
+  setCoverRadius: (coverRadius) => set({ coverRadius }),
   setShowSourceBadge: (showSourceBadge) => set({ showSourceBadge }),
   setLyricAlign: (lyricAlign) => set({ lyricAlign }),
   setLyricFontSize: (lyricFontSize) => set({ lyricFontSize }),
