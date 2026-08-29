@@ -1,14 +1,15 @@
 import { useEffect } from "react";
-import { Capacitor, type PluginListenerHandle } from "@capacitor/core";
+import type { PluginListenerHandle } from "@capacitor/core";
 import { useMusicStore } from "@/store/music-store";
 import { logger } from "@/lib/logger";
 import { AudioRoute } from "@/plugins/audio-route";
+import { IS_NATIVE } from "@/lib/api/config";
 
 export function useAudioRouteSafety(
   audioRef: React.RefObject<HTMLAudioElement | null>
 ) {
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (!IS_NATIVE) return;
 
     let listener: PluginListenerHandle | undefined;
     let disposed = false;

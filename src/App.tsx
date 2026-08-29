@@ -8,8 +8,8 @@ import { checkAndSync } from "@/lib/sync";
 import { cleanupCache } from "@/lib/utils/cache";
 import { revokeAll } from "@/lib/utils/blob-registry";
 import { stopBilibiliProxyServer } from "@/lib/bilibili/bilibili-native-player";
-import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
+import { IS_NATIVE } from "@/lib/api/config";
 export default function App() {
   // Sync Logic
   const { syncKey } = useSyncStore();
@@ -48,7 +48,7 @@ export default function App() {
 
   // Bilibili代理服务器生命周期管理
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (!IS_NATIVE) return;
 
     // 应用状态变化监听
     const handleAppStateChange = ({ isActive }: { isActive: boolean }) => {

@@ -5,12 +5,12 @@ import { createPortal } from "react-dom";
 import { Music2, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { forceHttps } from "@otter-music/shared";
-import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ensurePermission, triggerBlobDownload } from "@/lib/utils/download";
 import { blobToBase64 } from "@/lib/utils/base64";
 import { useExitLayer } from "@/hooks/useExitLayer";
 import toast from "react-hot-toast";
+import { IS_NATIVE } from "@/lib/api/config";
 
 interface MusicCoverProps {
   src?: string | null;
@@ -56,7 +56,7 @@ export function MusicCover({
     try {
       const filename = `${alt.replace(/[\\/:*?"<>|]/g, "_")}.jpg`;
 
-      if (Capacitor.isNativePlatform()) {
+      if (IS_NATIVE) {
         await ensurePermission();
         const response = await fetch(coverUrl);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);

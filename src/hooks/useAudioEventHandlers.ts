@@ -40,7 +40,9 @@ export function useAudioEventHandlers(
         duration,
         playbackRate: rate,
         position: audio.currentTime,
-      }).catch(console.error);
+      }).catch((e) =>
+        logger.error("MediaSession", "setPositionState failed", e)
+      );
     };
 
     const clearPauseTimer = () => {

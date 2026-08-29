@@ -58,6 +58,7 @@ export const useMusicStore = create<MusicState>()(
         favorites: state.favorites.map(cleanTrack),
         playlists: state.playlists.map(cleanPlaylist),
         queue: state.queue.map(cleanTrack),
+        originalQueue: state.originalQueue.map(cleanTrack),
         currentIndex: state.currentIndex,
         volume: state.volume,
         isRepeat: state.isRepeat,

@@ -6,10 +6,10 @@ import {
   type UpdateInfo,
   checkUpdate as apiCheckUpdate,
 } from "@/lib/api/update";
-import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { toast } from "react-hot-toast";
 import { logger } from "@/lib/logger";
+import { IS_NATIVE } from "@/lib/api/config";
 
 interface AppState {
   currentVersion: string;
@@ -42,12 +42,12 @@ const initialState: AppState = {
 
 const getCurrentVersion = async (): Promise<string> => {
   try {
-    if (Capacitor.isNativePlatform()) {
+    if (IS_NATIVE) {
       const info = await App.getInfo();
       return info.version;
     }
   } catch (e) {
-    console.error("Failed to get app version", e);
+    logger.error("app-store", "Failed to get app version", e);
   }
   return __APP_VERSION__;
 };

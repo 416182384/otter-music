@@ -1,6 +1,7 @@
 import {
   useMusicStore,
   type FullScreenBackgroundMode,
+  type LyricAlign,
 } from "@/store/music-store";
 import { useAppStore } from "@/store/app-store";
 import { usePodcastStore } from "@/store/podcast-store";
@@ -15,10 +16,10 @@ import type {
 } from "@/types/music";
 import type { PodcastRssSource } from "@/types/podcast";
 import type { AlistServer } from "@/types/alist";
-import { Capacitor } from "@capacitor/core";
 import { Encoding, Filesystem } from "@capacitor/filesystem";
 import { STORAGE_CONFIG } from "@/lib/storage-manager";
 import { logger } from "@/lib/logger";
+import { IS_NATIVE } from "@/lib/api/config";
 
 /** 备份数据版本号 */
 const CURRENT_VERSION = 1;
@@ -32,7 +33,7 @@ export async function saveBackupFile(json: string): Promise<string> {
   const fileName = backupFileName();
 
   try {
-    if (Capacitor.isNativePlatform()) {
+    if (IS_NATIVE) {
       const path = `${STORAGE_CONFIG.ROOT}/${fileName}`;
       await Filesystem.writeFile({
         path,
@@ -89,7 +90,11 @@ interface BackupPayload {
   bilibiliKeepOriginalMeta: boolean;
   bilibiliAutoMatchSuffix: string;
   fullScreenBackgroundMode: FullScreenBackgroundMode;
+  coverSize: number;
   showSourceBadge: boolean;
+  lyricAlign: LyricAlign;
+  lyricFontSize: number;
+  lyricOffset: number;
   downloadQuality: string;
   embedCover: boolean;
   embedLyric: boolean;
@@ -154,7 +159,11 @@ export function serializeStoreData(): string {
     bilibiliKeepOriginalMeta: state.bilibiliKeepOriginalMeta,
     bilibiliAutoMatchSuffix: state.bilibiliAutoMatchSuffix,
     fullScreenBackgroundMode: state.fullScreenBackgroundMode,
+    coverSize: state.coverSize,
     showSourceBadge: state.showSourceBadge,
+    lyricAlign: state.lyricAlign,
+    lyricFontSize: state.lyricFontSize,
+    lyricOffset: state.lyricOffset,
     downloadQuality: state.downloadQuality,
     embedCover: state.embedCover,
     embedLyric: state.embedLyric,
@@ -341,7 +350,11 @@ export function importStoreData(payload: BackupPayload): void {
     bilibiliKeepOriginalMeta: payload.bilibiliKeepOriginalMeta ?? false,
     bilibiliAutoMatchSuffix: payload.bilibiliAutoMatchSuffix ?? "高音质 原曲",
     fullScreenBackgroundMode: payload.fullScreenBackgroundMode ?? "theme",
+    coverSize: payload.coverSize ?? 288,
     showSourceBadge: payload.showSourceBadge ?? true,
+    lyricAlign: payload.lyricAlign ?? "center",
+    lyricFontSize: payload.lyricFontSize ?? 18,
+    lyricOffset: payload.lyricOffset ?? -0.5,
     playbackSpeed: payload.playbackSpeed ?? 1.0,
     downloadQuality: payload.downloadQuality ?? "320",
     embedCover: payload.embedCover ?? true,

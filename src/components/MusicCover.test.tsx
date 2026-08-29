@@ -15,6 +15,13 @@ vi.mock("@capacitor/core", () => ({
   },
 }));
 
+vi.mock("@/lib/api/config", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/config")>()),
+  get IS_NATIVE() {
+    return Capacitor.isNativePlatform();
+  },
+}));
+
 vi.mock("@capacitor/filesystem", () => ({
   Filesystem: { writeFile: vi.fn() },
   Directory: { ExternalStorage: "EXTERNAL_STORAGE" },

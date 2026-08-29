@@ -3,6 +3,7 @@ import { useMusicStore } from "@/store/music-store";
 import { MediaSession } from "@jofr/capacitor-media-session";
 import { forceHttps } from "@otter-music/shared";
 import { IS_NATIVE } from "@/lib/api/config";
+import { logger } from "@/lib/logger";
 
 const artworkCache = new Map<string, boolean>();
 
@@ -84,7 +85,7 @@ export function useMediaSessionIntegration(
           artwork: safeArtwork,
         });
       } catch (e) {
-        console.error("MediaSession metadata error:", e);
+        logger.error("MediaSession", "MediaSession metadata error:", e);
       }
     };
     updateMetadata();
@@ -107,7 +108,7 @@ export function useMediaSessionIntegration(
           playbackState,
         });
       } catch (e) {
-        console.error("MediaSession state error:", e);
+        logger.error("MediaSession", "MediaSession state error:", e);
       }
     };
 
@@ -152,7 +153,9 @@ export function useMediaSessionIntegration(
           if (!audio) return;
           audio
             .play()
-            .catch((e) => console.error("MediaSession play error:", e));
+            .catch((e) =>
+              logger.error("MediaSession", "MediaSession play error:", e)
+            );
         },
       ],
       [
@@ -208,7 +211,11 @@ export function useMediaSessionIntegration(
           handler
         );
       } catch (e) {
-        console.error(`Failed to set action handler for ${action}`, e);
+        logger.error(
+          "MediaSession",
+          `Failed to set action handler for ${action}`,
+          e
+        );
       }
     }
   }, [audioRef]);

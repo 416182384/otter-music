@@ -7,6 +7,7 @@ import { useUrlCacheStore, buildUrlCacheKey } from "@/store/url-cache-store";
 import { retry } from "@/lib/utils";
 import { buildDownloadKey } from "@/lib/utils/download";
 import type { MusicSource, MusicTrack } from "@/types/music";
+import { IS_NATIVE } from "@/lib/api/config";
 
 /**
  * 获取远程音频 URL 并带有重试机制
@@ -42,7 +43,7 @@ export async function resolveTrackUrl(
   const trackKey = buildUrlCacheKey(source, trackId, urlId, String(quality));
 
   // Native 本地下载资源
-  if (Capacitor.isNativePlatform() && source !== "local") {
+  if (IS_NATIVE && source !== "local") {
     const dlKey = buildDownloadKey(source, trackId);
     const uri = useDownloadStore.getState().getUri(dlKey);
     if (uri) return { url: Capacitor.convertFileSrc(uri), dlKey };

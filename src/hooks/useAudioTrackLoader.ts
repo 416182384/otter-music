@@ -5,13 +5,13 @@ import { useSourceQualityStore } from "@/store/source-quality-store";
 import { useDownloadStore } from "@/store/download-store";
 import { useOfflineStore } from "@/store/offline-store";
 import { useUrlCacheStore, buildUrlCacheKey } from "@/store/url-cache-store";
-import { Capacitor } from "@capacitor/core";
 import { buildDownloadKey } from "@/lib/utils/download";
 import type { MusicSource } from "@/types/music";
 import toast from "react-hot-toast";
 import { handleAutoMatch } from "@/lib/audio-match";
 import { logger } from "@/lib/logger";
 import { resolveTrackUrl } from "@/lib/audio-resolver";
+import { IS_NATIVE } from "@/lib/api/config";
 
 const AUDIO_READY_TIMEOUT = 8000;
 type FallbackStage = "none" | "proxy" | "final";
@@ -23,7 +23,7 @@ function isTrackPlayable(
   if (!track) return false;
   if (track.source === "local" || navigator.onLine) return true;
 
-  if (Capacitor.isNativePlatform()) {
+  if (IS_NATIVE) {
     const downloadKey = buildDownloadKey(track.source, track.id);
     return useDownloadStore.getState().hasRecord(downloadKey);
   }

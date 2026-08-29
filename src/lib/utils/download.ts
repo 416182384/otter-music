@@ -1,4 +1,3 @@
-import { Capacitor } from "@capacitor/core";
 import { Filesystem, Encoding } from "@capacitor/filesystem";
 import { FileTransfer } from "@capacitor/file-transfer";
 import { MusicProviderFactory } from "@/lib/music-provider";
@@ -18,7 +17,7 @@ import { useDownloadStore } from "@/store/download-store";
 import { useMusicStore } from "@/store/music-store";
 
 import { toastUtils } from "./toast";
-import { getProxyUrl, isProxyUrl } from "@/lib/api/config";
+import { getProxyUrl, isProxyUrl, IS_NATIVE } from "@/lib/api/config";
 import { logger } from "@/lib/logger";
 import { processBatchIO } from "@/lib/utils";
 import { embedMetadata } from "./id3-embed";
@@ -83,7 +82,7 @@ async function performDownloadOne(
   toastId?: string,
   opts?: PerformDownloadOpts
 ): Promise<void> {
-  const isNative = Capacitor.isNativePlatform();
+  const isNative = IS_NATIVE;
   const br = parseInt(useMusicStore.getState().downloadQuality) || 320;
 
   if (isNative) {
@@ -494,7 +493,7 @@ export function triggerBlobDownload(
 export async function saveDownloadRecordsToDisk(
   records: Record<string, unknown>
 ) {
-  if (!Capacitor.isNativePlatform()) return;
+  if (!IS_NATIVE) return;
 
   try {
     await ensureDir(AppPaths.Data);
@@ -515,7 +514,7 @@ export async function loadDownloadRecordsFromDisk(): Promise<Record<
   string,
   unknown
 > | null> {
-  if (!Capacitor.isNativePlatform()) return null;
+  if (!IS_NATIVE) return null;
 
   try {
     const result = await Filesystem.readFile({
@@ -531,7 +530,7 @@ export async function loadDownloadRecordsFromDisk(): Promise<Record<
 
     return JSON.parse(content);
   } catch (e) {
-    console.warn("读取下载记录失败:", e);
+    logger.warn("download", "读取下载记录失败:", e);
     return null;
   }
 }
