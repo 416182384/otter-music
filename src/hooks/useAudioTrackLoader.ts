@@ -184,9 +184,12 @@ export function useAudioTrackLoader(
         // 代理备用线路容灾时，直接使用已缓存的远程 URL
         if (remoteUrlRef.current) return { url: remoteUrlRef.current };
 
+        // 播放错误恢复时强制绕过 URL 缓存重新请求，
+        // 否则会命中缓存里的过期签名直链，导致恢复后二次失败
         const result = await resolveTrackUrl(
           currentTrack,
-          parseInt(quality, 10)
+          parseInt(quality, 10),
+          { forceRefresh: isRecovery }
         );
         // 同步到 remoteUrlRef 以支持代理备用线路容灾
         if (result.url && !result.dlKey) {

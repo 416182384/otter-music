@@ -101,14 +101,17 @@ export async function cleanupCache() {
   }
 }
 
-/** 核心请求函数 */
+/** 核心请求函数；forceRefresh 时跳过磁盘缓存重新请求，结果照常写回覆盖 */
 export async function cachedFetch<T>(
   key: string,
   fetcher: () => Promise<T | null>,
-  ttl: number = DEFAULT_TTL
+  ttl: number = DEFAULT_TTL,
+  forceRefresh = false
 ): Promise<T | null> {
-  const disk = await getFromDisk<T>(key);
-  if (disk !== null) return disk;
+  if (!forceRefresh) {
+    const disk = await getFromDisk<T>(key);
+    if (disk !== null) return disk;
+  }
 
   const result = await mutate(
     key,

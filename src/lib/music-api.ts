@@ -124,7 +124,8 @@ export const musicApi = {
   async getUrl(
     idOrUrl: string,
     source: MusicSource,
-    br = 192
+    br = 192,
+    options?: { forceRefresh?: boolean }
   ): Promise<string | null> {
     if (idOrUrl.startsWith("http")) return idOrUrl;
     const key = `url:${source}:${idOrUrl}:${br}`;
@@ -143,7 +144,8 @@ export const musicApi = {
           return null;
         }
       },
-      TTL_SHORT
+      TTL_SHORT,
+      options?.forceRefresh
     );
   },
 

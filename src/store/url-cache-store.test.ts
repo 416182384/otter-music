@@ -66,7 +66,10 @@ describe("UrlCacheStore", () => {
       const key = buildUrlCacheKey("netease", "123", "123", "128");
       useUrlCacheStore.getState().set(key, "https://example.com/a.mp3");
       expect(useUrlCacheStore.getState().urlMap).toEqual({
-        [key]: "https://example.com/a.mp3",
+        [key]: {
+          url: "https://example.com/a.mp3",
+          cachedAt: expect.any(Number),
+        },
       });
     });
 
@@ -111,6 +114,60 @@ describe("UrlCacheStore", () => {
       useUrlCacheStore.getState().set(key, blobUrl);
 
       expect(revokeBlobUrl).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("TTL", () => {
+    const key = buildUrlCacheKey("netease", "123", "123", "128");
+
+    it("should return url within TTL", () => {
+      useUrlCacheStore.setState({
+        urlMap: {
+          [key]: {
+            url: "https://example.com/a.mp3",
+            cachedAt: Date.now() - 10 * 60 * 1000,
+          },
+        },
+      });
+      expect(useUrlCacheStore.getState().get(key)).toBe(
+        "https://example.com/a.mp3"
+      );
+    });
+
+    it("should treat expired entry as miss and remove it", () => {
+      useUrlCacheStore.setState({
+        urlMap: {
+          [key]: {
+            url: "https://example.com/expired.mp3",
+            cachedAt: Date.now() - 16 * 60 * 1000,
+          },
+        },
+      });
+      expect(useUrlCacheStore.getState().get(key)).toBeUndefined();
+      expect(useUrlCacheStore.getState().urlMap[key]).toBeUndefined();
+    });
+
+    it("should treat legacy plain-string entry as expired", () => {
+      useUrlCacheStore.setState({
+        urlMap: { [key]: "https://example.com/legacy.mp3" } as never,
+      });
+      expect(useUrlCacheStore.getState().get(key)).toBeUndefined();
+      expect(useUrlCacheStore.getState().urlMap[key]).toBeUndefined();
+    });
+
+    it("should never expire blob URLs", () => {
+      const blobKey = buildUrlCacheKey("netease", "456", "456", "128");
+      useUrlCacheStore.setState({
+        urlMap: {
+          [blobKey]: {
+            url: "blob:https://example.com/audio",
+            cachedAt: Date.now() - 24 * 60 * 60 * 1000,
+          },
+        },
+      });
+      expect(useUrlCacheStore.getState().get(blobKey)).toBe(
+        "blob:https://example.com/audio"
+      );
     });
   });
 
