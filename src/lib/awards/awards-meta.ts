@@ -30,7 +30,7 @@ export const AWARDS: AwardMeta[] = [
   {
     id: "gma",
     name: "台湾金曲奖",
-    enName: "Golden Melody Awards",
+    enName: "GMA",
     latestYear: 2026,
     years: GMA_YEARS,
     colors: ["#451a03", "#b45309"],
@@ -38,7 +38,7 @@ export const AWARDS: AwardMeta[] = [
   {
     id: "grammy",
     name: "格莱美奖",
-    enName: "Grammy Awards",
+    enName: "Grammy",
     latestYear: 2026,
     years: GRAMMY_YEARS,
     colors: ["#18181b", "#713f12"],

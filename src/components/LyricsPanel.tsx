@@ -396,6 +396,14 @@ export function LyricsPanel({ track, active = true }: LyricsPanelProps) {
     );
   }
 
+  if (lyrics.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center text-sm text-white/40">
+        暂无歌词
+      </div>
+    );
+  }
+
   const LyricsList = (
     <div
       className={cn(
@@ -407,43 +415,35 @@ export function LyricsPanel({ track, active = true }: LyricsPanelProps) {
         lyricAlign === "right" && "items-end"
       )}
     >
-      {lyrics.length === 0 ? (
-        <div className="h-full flex items-center justify-center">
-          <p className="text-white/40 text-center">暂无歌词</p>
+      {Array.from({ length: PADDING_LINES }).map((_, i) => (
+        <div key={`pad-top-${i}`} className="h-6 shrink-0" />
+      ))}
+
+      {lyrics.map((line, i) => (
+        <div
+          key={`${line.time}-${i}`}
+          ref={(el) => {
+            lineRefs.current[i] = el;
+          }}
+          className={cn(
+            "w-full flex",
+            lyricAlign === "center" && "justify-center",
+            lyricAlign === "left" && "justify-start",
+            lyricAlign === "right" && "justify-end"
+          )}
+        >
+          <LyricLineView
+            line={line}
+            isActive={i === activeIndex}
+            align={lyricAlign}
+            fontSize={lyricFontSize}
+          />
         </div>
-      ) : (
-        <>
-          {Array.from({ length: PADDING_LINES }).map((_, i) => (
-            <div key={`pad-top-${i}`} className="h-6 shrink-0" />
-          ))}
+      ))}
 
-          {lyrics.map((line, i) => (
-            <div
-              key={`${line.time}-${i}`}
-              ref={(el) => {
-                lineRefs.current[i] = el;
-              }}
-              className={cn(
-                "w-full flex",
-                lyricAlign === "center" && "justify-center",
-                lyricAlign === "left" && "justify-start",
-                lyricAlign === "right" && "justify-end"
-              )}
-            >
-              <LyricLineView
-                line={line}
-                isActive={i === activeIndex}
-                align={lyricAlign}
-                fontSize={lyricFontSize}
-              />
-            </div>
-          ))}
-
-          {Array.from({ length: PADDING_LINES }).map((_, i) => (
-            <div key={`pad-bottom-${i}`} className="h-6 shrink-0" />
-          ))}
-        </>
-      )}
+      {Array.from({ length: PADDING_LINES }).map((_, i) => (
+        <div key={`pad-bottom-${i}`} className="h-6 shrink-0" />
+      ))}
     </div>
   );
 

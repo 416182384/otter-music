@@ -45,18 +45,43 @@ export function grammyKind(name: string): AwardKind | undefined {
  * 金曲奖分类归属推导（按顺序匹配，注意表演者判断先于歌曲，
  * 避免「最佳国语歌曲男演唱人奖」这类表演者奖被误判为 song）：
  * 1. 技术 / 特别奖（作词、作曲、编曲、制作人、MV、装帧、包装、录音、特别奖、评审团奖）→ 无 kind
+ *    （演唱/演奏录音专辑奖的获奖者是录音师而非专辑艺人，同样归入无 kind）
  * 2. 专辑 / 唱片类 → album
- * 3. 表演者类（歌手、演唱人、乐团、新人、组合、团体、演奏、传统音乐诠释）→ artist
+ * 3. 表演者类（歌手、演唱人、乐团、新人、组合、团体、演奏、传统音乐诠释）→ album
+ *    （表演者历来凭某张专辑获奖，title 即专辑名，按专辑解析跳详情更实用）
  * 4. 歌曲类 → song
  */
 export function gmaKind(name: string): AwardKind | undefined {
-  if (/作词|作曲|编曲|制作人|录影带|MV|装帧|包装|录音奖|特别|评审/.test(name))
+  if (/作词|作曲|编曲|制作人|录影带|MV|装帧|包装|录音|特别|评审/.test(name))
     return undefined;
   if (name.includes("专辑") || name.includes("唱片")) return "album";
   if (/歌手|演唱|乐团|新人|组合|团体|演奏人|演奏奖|诠释/.test(name))
-    return "artist";
+    return "album";
   if (name.includes("歌曲")) return "song";
   return undefined;
+}
+
+/**
+ * 无 kind 分类的 title 是否为专辑名（决定兜底搜索是否设 album 意图）：
+ * 专辑 / 唱片 / 装帧 / 包装 / 录音（GMA）与 Album Notes / Package /
+ * Engineered / Immersive（Grammy）等技术类奖项的 title 为专辑名；
+ * 词曲、MV、Remix 类的 title 为歌曲名。
+ */
+export function awardTitleIsAlbum(award: string, name: string): boolean {
+  if (award === "gma") return /专辑|唱片|装帧|包装|录音/.test(name);
+  return /Album|Soundtrack|Package|Notes|Engineered|Immersive/i.test(name);
+}
+
+/**
+ * 获奖者是否为纯技术署名（装帧设计、录音/混音/母带工程师、专辑包装、
+ * Grammy 录音工程 / 内页撰写等）。此类人名对搜索无益，兜底关键词只保留作品名。
+ */
+export function awardWinnerIsTechnicalCredit(
+  award: string,
+  name: string
+): boolean {
+  if (award === "gma") return /装帧|包装|录音/.test(name);
+  return /Package|Notes|Engineered|Immersive/i.test(name);
 }
 
 export function awardKind(award: AwardId, name: string): AwardKind | undefined {

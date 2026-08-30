@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   awardKind,
+  awardTitleIsAlbum,
+  awardWinnerIsTechnicalCredit,
   cleanAwardTitle,
   gmaKind,
   grammyKind,
@@ -118,11 +120,12 @@ describe("gmaKind", () => {
     expect(gmaKind("最佳台语专辑奖")).toBe("album");
   });
 
-  it("表演者类先于歌曲判断（最佳国语歌曲男演唱人奖 → artist）", () => {
-    expect(gmaKind("最佳华语男歌手奖")).toBe("artist");
-    expect(gmaKind("最佳国语歌曲男演唱人奖")).toBe("artist");
-    expect(gmaKind("最佳乐团奖")).toBe("artist");
-    expect(gmaKind("最佳演唱组合奖")).toBe("artist");
+  it("表演者类先于歌曲判断（最佳国语歌曲男演唱人奖 → album）", () => {
+    expect(gmaKind("最佳华语男歌手奖")).toBe("album");
+    expect(gmaKind("最佳国语歌曲男演唱人奖")).toBe("album");
+    expect(gmaKind("最佳乐团奖")).toBe("album");
+    expect(gmaKind("最佳演唱组合奖")).toBe("album");
+    expect(gmaKind("最佳新人奖")).toBe("album");
   });
 
   it("歌曲类 → song", () => {
@@ -130,12 +133,14 @@ describe("gmaKind", () => {
     expect(gmaKind("最佳台语歌曲奖")).toBe("song");
   });
 
-  it("技术 / 特别奖 → undefined", () => {
+  it("技术 / 特别奖 → undefined（含演唱/演奏录音专辑奖，获奖者是录音师）", () => {
     expect(gmaKind("最佳作词人奖")).toBeUndefined();
     expect(gmaKind("最佳作曲人奖")).toBeUndefined();
     expect(gmaKind("最佳编曲人奖")).toBeUndefined();
     expect(gmaKind("最佳专辑制作人奖")).toBeUndefined();
     expect(gmaKind("最佳MV奖")).toBeUndefined();
+    expect(gmaKind("最佳演唱录音专辑奖")).toBeUndefined();
+    expect(gmaKind("最佳演奏录音专辑奖")).toBeUndefined();
     expect(gmaKind("特别贡献奖")).toBeUndefined();
     expect(gmaKind("评审团奖")).toBeUndefined();
   });
@@ -145,6 +150,78 @@ describe("awardKind", () => {
   it("按奖项 id 分发到对应推导", () => {
     expect(awardKind("grammy", "Best New Artist")).toBe("artist");
     expect(awardKind("gma", "年度专辑奖")).toBe("album");
+  });
+});
+
+describe("awardTitleIsAlbum", () => {
+  it("gma 专辑/装帧/包装等技术类 → true，词曲/MV 类 → false", () => {
+    expect(awardTitleIsAlbum("gma", "最佳专辑制作人奖")).toBe(true);
+    expect(awardTitleIsAlbum("gma", "最佳装帧设计奖")).toBe(true);
+    expect(awardTitleIsAlbum("gma", "最佳单曲制作人奖")).toBe(false);
+    expect(awardTitleIsAlbum("gma", "最佳作词人奖")).toBe(false);
+    expect(awardTitleIsAlbum("gma", "最佳MV奖")).toBe(false);
+    expect(awardTitleIsAlbum("gma", "评审团奖")).toBe(false);
+  });
+
+  it("grammy 工程技术类 → true，词曲/Remix/MV/Producer → false", () => {
+    expect(
+      awardTitleIsAlbum("grammy", "Best Engineered Album, Non-Classical")
+    ).toBe(true);
+    expect(awardTitleIsAlbum("grammy", "Best Recording Package")).toBe(true);
+    expect(awardTitleIsAlbum("grammy", "Best Album Notes")).toBe(true);
+    expect(awardTitleIsAlbum("grammy", "Best Immersive Audio Album")).toBe(
+      true
+    );
+    expect(awardTitleIsAlbum("grammy", "Best Remixed Recording")).toBe(false);
+    expect(awardTitleIsAlbum("grammy", "Best Music Video")).toBe(false);
+    expect(
+      awardTitleIsAlbum("grammy", "Producer Of The Year, Non-Classical")
+    ).toBe(false);
+  });
+});
+
+describe("awardWinnerIsTechnicalCredit", () => {
+  it("gma 装帧/录音类 → true，词曲/制作人类 → false", () => {
+    expect(awardWinnerIsTechnicalCredit("gma", "最佳装帧设计奖")).toBe(true);
+    expect(awardWinnerIsTechnicalCredit("gma", "最佳演唱录音专辑奖")).toBe(
+      true
+    );
+    expect(awardWinnerIsTechnicalCredit("gma", "最佳演奏录音专辑奖")).toBe(
+      true
+    );
+    expect(awardWinnerIsTechnicalCredit("gma", "最佳专辑制作人奖")).toBe(false);
+    expect(awardWinnerIsTechnicalCredit("gma", "最佳作词人奖")).toBe(false);
+    expect(awardWinnerIsTechnicalCredit("gma", "年度专辑奖")).toBe(false);
+  });
+
+  it("grammy 工程/包装/内页类 → true，Remix/MV/Producer → false", () => {
+    expect(
+      awardWinnerIsTechnicalCredit(
+        "grammy",
+        "Best Engineered Album, Non-Classical"
+      )
+    ).toBe(true);
+    expect(
+      awardWinnerIsTechnicalCredit("grammy", "Best Recording Package")
+    ).toBe(true);
+    expect(awardWinnerIsTechnicalCredit("grammy", "Best Album Notes")).toBe(
+      true
+    );
+    expect(
+      awardWinnerIsTechnicalCredit("grammy", "Best Immersive Audio Album")
+    ).toBe(true);
+    expect(
+      awardWinnerIsTechnicalCredit("grammy", "Best Remixed Recording")
+    ).toBe(false);
+    expect(awardWinnerIsTechnicalCredit("grammy", "Best Music Video")).toBe(
+      false
+    );
+    expect(
+      awardWinnerIsTechnicalCredit(
+        "grammy",
+        "Producer Of The Year, Non-Classical"
+      )
+    ).toBe(false);
   });
 });
 

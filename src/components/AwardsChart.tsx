@@ -13,6 +13,8 @@ import {
   Trophy,
 } from "lucide-react";
 import {
+  awardTitleIsAlbum,
+  awardWinnerIsTechnicalCredit,
   cleanAwardTitle,
   fetchAward,
   splitAwardArtists,
@@ -23,6 +25,7 @@ import { getAwardMeta } from "@/lib/awards/awards-meta";
 import { searchAlbums, searchArtists } from "@/lib/netease/netease-api";
 import { isArtistMatch, isNameMatch } from "@/lib/utils/music-key";
 import { useMusicStore } from "@/store/music-store";
+import type { SearchIntent } from "@/types/music";
 import { usePlayContextHandler } from "@/hooks/usePlayContextHandler";
 import { useImportPlaylist } from "@/hooks/useImportPlaylist";
 import { cn } from "@/lib/utils";
@@ -88,8 +91,11 @@ interface AwardsChartProps {
 
 /**
  * 奖项页（金曲奖 / 格莱美奖）：品牌化 Hero + 获奖清单。
- * kind=song 点击直接播放（占位换源）；album/artist 网易云严格匹配跳详情，
- * 未命中或无 kind（制作人/作词作曲/技术类）回落聚合搜索。
+ * kind=song 点击直接播放（占位换源）；album/artist 网易云严格匹配跳详情
+ * （GMA 表演者奖按专辑解析——其 title 即获奖专辑）；未命中或无 kind
+ * （制作人/作词作曲/技术类）回落聚合搜索，关键词为「作品 人」
+ * （装帧/录音/工程等技术署名类只搜作品名），无 kind 且 title 为
+ * 专辑名时另设 album 意图加权排序。
  * year 缺省最新一届，通过 ?year= 切换（年份只在详情页内用原生 select 更改）。
  */
 export function AwardsChart({ awardId, year }: AwardsChartProps) {
@@ -147,26 +153,32 @@ export function AwardsChart({ awardId, year }: AwardsChartProps) {
     (row: AwardData["categories"][number]) => {
       const artist = firstWinner(row.winner);
       const title = row.title ? cleanAwardTitle(row.title) : "";
-      // 歌手类搜人名；专辑类搜"艺人 + 作品"；无 kind（制作人/作词作曲等）搜获奖者人名
+      // 兜底关键词默认「作品 人」；技术署名类（装帧/录音/工程等）获奖者非
+      // 音乐人，人名只会污染搜索结果，只保留作品名
       const keyword =
-        row.kind === "album" && title && artist
-          ? `${artist} ${title}`
-          : artist || title;
+        title && artist && !awardWinnerIsTechnicalCredit(awardId, row.name)
+          ? `${title} ${artist}`
+          : title || artist;
+      let intent: SearchIntent | null = null;
+      if (row.kind === "album" || row.kind === "artist") {
+        intent = {
+          type: row.kind,
+          name: title || undefined,
+          artist: artist || undefined,
+        };
+      } else if (title && awardTitleIsAlbum(awardId, row.name)) {
+        // 无 kind（制作人/作词作曲/技术类）：title 为专辑名时设 album 意图，
+        // 不带 artist（winner 是制作人/工程师而非专辑艺人）
+        intent = { type: "album", name: title };
+      }
       setSearchQuery(keyword);
-      setSearchIntent(
-        row.kind === "album" || row.kind === "artist"
-          ? {
-              type: row.kind,
-              name: title || undefined,
-              artist: artist || undefined,
-            }
-          : null
-      );
+      setSearchIntent(intent);
       setSearchSource("all");
       setSearchResults([]);
       navigate("/search");
     },
     [
+      awardId,
       navigate,
       setSearchQuery,
       setSearchIntent,

@@ -135,6 +135,7 @@ export const NETEASE_CATS: CatGroup[] = [
 
 export const SPECIAL_CATS: CatItem[] = [
   F("官方"),
+  { id: "Awards", name: "奖项" },
   F("榜单"),
   { id: "toplist", name: "排行榜" },
 ];
@@ -155,11 +156,10 @@ export const RECOMMEND_CATS: CatItem[] = [
   F("轻音乐"),
 
   { id: "Billboard", name: "Billboard" },
-  { id: "Awards", name: "奖项" },
   F("播客"),
 ];
 
-/** 不走网易云 browse 分页适配器的分类（含「我的」+ 3 个特殊子歌单） */
+/** 不走网易云 browse 分页适配器的分类（含「我的」、独立 Section 与精选下的特殊子 Tab） */
 export const NON_BROWSE_CATEGORIES: ReadonlySet<string> = new Set([
   "mine",
   "播客",

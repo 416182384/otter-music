@@ -119,6 +119,8 @@ src/
 │   ├── audio-match.ts          # 自动换源与匹配结果回写
 │   ├── api/                    # 服务端配置、同步、更新、播客接口
 │   ├── alist/                  # Alist 网盘 API 客户端
+│   ├── awards/                 # 金曲奖/格莱美奖榜单数据与解析
+│   ├── billboard/              # Billboard 榜单 API 客户端
 │   ├── bilibili/               # B站 API 客户端与播放适配
 │   ├── kugou/                  # 酷狗 API 客户端
 │   ├── kuwo/                   # 酷我 API 客户端

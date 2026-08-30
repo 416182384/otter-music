@@ -50,7 +50,6 @@ const MARKET_SECTIONS: Record<string, ComponentType> = {
   播客: PodcastSection,
   Alist: AlistSection,
   Billboard: BillboardSection,
-  Awards: AwardsSection,
 };
 
 export function PlaylistMarket() {
@@ -399,36 +398,42 @@ export function PlaylistMarket() {
               </div>
             )}
 
-            {active.loading ? (
-              <div className="h-60 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                <span className="text-xs tracking-widest uppercase opacity-50">
-                  加载中...
-                </span>
-              </div>
+            {activeCategory === "featured" && featuredTab === "Awards" ? (
+              <AwardsSection />
             ) : (
-              <PlaylistGrid
-                list={active.items}
-                onClick={(id) => navigate(`/netease-playlist/${id}`)}
-              />
-            )}
+              <>
+                {active.loading ? (
+                  <div className="h-60 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <span className="text-xs tracking-widest uppercase opacity-50">
+                      加载中...
+                    </span>
+                  </div>
+                ) : (
+                  <PlaylistGrid
+                    list={active.items}
+                    onClick={(id) => navigate(`/netease-playlist/${id}`)}
+                  />
+                )}
 
-            <div
-              ref={active.observerTargetRef}
-              className="h-12 w-full mt-6 flex items-center justify-center opacity-80"
-            >
-              {active.fetching && !active.loading && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>加载中...</span>
+                <div
+                  ref={active.observerTargetRef}
+                  className="h-12 w-full mt-6 flex items-center justify-center opacity-80"
+                >
+                  {active.fetching && !active.loading && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>加载中...</span>
+                    </div>
+                  )}
+                  {!active.hasMore && active.items.length > 0 && (
+                    <span className="text-xs text-muted-foreground/50 tracking-wide uppercase">
+                      没有更多了-_-
+                    </span>
+                  )}
                 </div>
-              )}
-              {!active.hasMore && active.items.length > 0 && (
-                <span className="text-xs text-muted-foreground/50 tracking-wide uppercase">
-                  没有更多了-_-
-                </span>
-              )}
-            </div>
+              </>
+            )}
           </div>
         )}
       </main>
