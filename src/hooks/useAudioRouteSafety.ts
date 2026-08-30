@@ -21,8 +21,9 @@ export function useAudioRouteSafety(
           const state = useMusicStore.getState();
           if (audio?.paused !== false && !state.isPlaying) return;
 
-          audio?.pause();
+          // 先同步 store 再暂停，避免被"外部抢占恢复"逻辑误判
           if (state.isPlaying) state.setIsPlaying(false);
+          audio?.pause();
         });
 
         if (disposed) await listener.remove();

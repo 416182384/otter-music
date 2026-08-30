@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { throttle } from "@/lib/utils";
 import { useMusicStore } from "@/store/music-store";
+import { useAppStore } from "@/store/app-store";
 import { useSourceQualityStore } from "@/store/source-quality-store";
 import { useHistoryStore } from "@/store/history-store";
 import { useOfflineStore } from "@/store/offline-store";
@@ -112,6 +113,18 @@ export function useAudioEventHandlers(
         if (isSwitchingTrackRef.current || audio.ended || audio.error) return;
 
         clearPauseTimer();
+        const state = getMusicState();
+
+        // pause 事件触发时 store 仍为播放中 ⇒ 非用户发起(如其他应用抢占音频焦点)
+        if (
+          useAppStore.getState().allowSimultaneousPlayback &&
+          state.isPlaying
+        ) {
+          logger.info("useAudioEventHandlers", "External pause, resuming");
+          audio.play().catch(() => state.setIsPlaying(false));
+          return;
+        }
+
         pauseTimerRef.current = setTimeout(() => {
           if (
             isSwitchingTrackRef.current ||

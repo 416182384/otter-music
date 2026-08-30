@@ -129,6 +129,17 @@ export const useUrlCacheStore = create<UrlCacheState>()(
       name: storeKey.UrlCacheStore,
       storage: createJSONStorage(() => idbStorage),
       partialize: (state) => ({ urlMap: state.urlMap }),
+      // blob URL 仅当前页面会话有效，重启后必失效；
+      // 但 blob 条目被标记为永不过期，必须在恢复时清除避免一直命中死链
+      onRehydrateStorage: () => () => purgeDeadBlobEntries(),
     }
   )
 );
+
+/** 清除持久化恢复回来的 blob 条目（跨会话已失效），供 rehydrate 与单测使用 */
+export function purgeDeadBlobEntries() {
+  const { urlMap, delete: del } = useUrlCacheStore.getState();
+  for (const key of Object.keys(urlMap)) {
+    if (entryUrl(urlMap[key])?.startsWith("blob:")) del(key);
+  }
+}

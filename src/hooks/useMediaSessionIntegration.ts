@@ -161,6 +161,8 @@ export function useMediaSessionIntegration(
       [
         "pause",
         () => {
+          // 先同步 store 再暂停，避免被"外部抢占恢复"逻辑误判
+          useMusicStore.getState().setIsPlaying(false);
           const audio = audioRef.current;
           audio?.pause();
         },

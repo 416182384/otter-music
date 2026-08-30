@@ -22,6 +22,7 @@ import {
   Database,
   Shield,
   Bell,
+  Music4,
 } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { useAppStore } from "@/store/app-store";
@@ -39,6 +40,7 @@ import { DataBackup } from "./settings/DataBackup";
 import { WebDavBackup } from "./settings/WebDavBackup";
 import { LyricStyleSetting } from "./settings/LyricStyleSetting";
 import { useState } from "react";
+import { IS_NATIVE } from "@/lib/api/config";
 
 interface SettingsPageProps {
   onBack?: () => void;
@@ -64,7 +66,7 @@ function SettingsSection({
 export function SettingsPage({ onBack }: SettingsPageProps) {
   const navigate = useNavigate();
   const [dataBackupOpen, setDataBackupOpen] = useState(false);
-  const { enableUpdateNotify, setEnableUpdateNotify } = useAppStore();
+  const { enableUpdateNotify, setEnableUpdateNotify, allowSimultaneousPlayback, setAllowSimultaneousPlayback } = useAppStore();
   const {
     volume,
     setVolume,
@@ -114,6 +116,18 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
             }
           />
           <QualitySelect />
+          {IS_NATIVE && (
+            <SettingItem
+              icon={Music4}
+              title="与其他应用同时播放"
+              action={
+                <Switch
+                  checked={allowSimultaneousPlayback}
+                  onCheckedChange={setAllowSimultaneousPlayback}
+                />
+              }
+            />
+          )}
           <SleepTimerSetting />
           <PlaybackSpeedSetting />
           <DownloadSetting />

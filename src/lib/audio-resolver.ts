@@ -92,5 +92,15 @@ export async function resolveTrackUrl(
     forceRefresh
   );
   cacheStore.set(trackKey, remoteUrl);
+  // 强刷成功后回写 stream-cache 快照，否则下次播放仍会命中其中的过期 URL
+  if (
+    forceRefresh &&
+    offlineRecord?.source === "stream-cache" &&
+    offlineRecord.trackSource === source
+  ) {
+    useOfflineStore
+      .getState()
+      .addRecord({ ...offlineRecord, url: remoteUrl, cachedAt: Date.now() });
+  }
   return { url: remoteUrl };
 }

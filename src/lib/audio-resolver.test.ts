@@ -36,7 +36,10 @@ const { urlCacheMock, offlineMock } = vi.hoisted(() => ({
     set: vi.fn(),
     delete: vi.fn(),
   },
-  offlineMock: { records: {} as Record<string, unknown> },
+  offlineMock: {
+    records: {} as Record<string, unknown>,
+    addRecord: vi.fn(),
+  },
 }));
 
 vi.mock("@/store/offline-store", () => ({
@@ -202,6 +205,29 @@ describe("resolveTrackUrl forceRefresh", () => {
 
     expect(result.url).toBe("https://cdn.example.com/new.mp3");
     expect(musicApi.getUrl).toHaveBeenCalled();
+  });
+
+  it("forceRefresh rewrites stream-cache offline record with fresh url", async () => {
+    offlineMock.records = { "netease-1": streamCacheRecord };
+    vi.mocked(musicApi.getUrl).mockResolvedValue(
+      "https://cdn.example.com/new.mp3"
+    );
+
+    await resolveTrackUrl(remoteTrack, 192, { forceRefresh: true });
+
+    expect(offlineMock.addRecord).toHaveBeenCalledWith({
+      ...streamCacheRecord,
+      url: "https://cdn.example.com/new.mp3",
+      cachedAt: expect.any(Number),
+    });
+  });
+
+  it("does not rewrite stream-cache record without forceRefresh", async () => {
+    offlineMock.records = { "netease-1": streamCacheRecord };
+
+    await resolveTrackUrl(remoteTrack, 192);
+
+    expect(offlineMock.addRecord).not.toHaveBeenCalled();
   });
 
   it("reuses stream-cache offline record without forceRefresh", async () => {

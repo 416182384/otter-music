@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useUrlCacheStore, buildUrlCacheKey } from "./url-cache-store";
+import {
+  useUrlCacheStore,
+  buildUrlCacheKey,
+  purgeDeadBlobEntries,
+} from "./url-cache-store";
 
 vi.mock("@/lib/storage-adapter", () => ({
   idbStorage: {
@@ -167,6 +171,32 @@ describe("UrlCacheStore", () => {
       });
       expect(useUrlCacheStore.getState().get(blobKey)).toBe(
         "blob:https://example.com/audio"
+      );
+    });
+  });
+
+  describe("purgeDeadBlobEntries", () => {
+    it("should remove blob entries on rehydrate (dead across sessions)", () => {
+      const blobKey = buildUrlCacheKey("netease", "456", "456", "128");
+      const liveKey = buildUrlCacheKey("netease", "789", "789", "128");
+      useUrlCacheStore.setState({
+        urlMap: {
+          [blobKey]: {
+            url: "blob:https://example.com/audio",
+            cachedAt: Date.now(),
+          },
+          [liveKey]: {
+            url: "https://example.com/live.mp3",
+            cachedAt: Date.now(),
+          },
+        },
+      });
+
+      purgeDeadBlobEntries();
+
+      expect(useUrlCacheStore.getState().urlMap[blobKey]).toBeUndefined();
+      expect(useUrlCacheStore.getState().get(liveKey)).toBe(
+        "https://example.com/live.mp3"
       );
     });
   });
