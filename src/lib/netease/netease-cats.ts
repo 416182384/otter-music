@@ -155,6 +155,7 @@ export const RECOMMEND_CATS: CatItem[] = [
   F("轻音乐"),
 
   { id: "Billboard", name: "Billboard" },
+  { id: "Awards", name: "奖项" },
   F("播客"),
 ];
 
@@ -164,4 +165,5 @@ export const NON_BROWSE_CATEGORIES: ReadonlySet<string> = new Set([
   "播客",
   "Alist",
   "Billboard",
+  "Awards",
 ]);

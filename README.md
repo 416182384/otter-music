@@ -26,7 +26,7 @@
 
 - **多音源聚合与回退**：支持多源检索与播放失败回退（本地下载/缓存/直连/代理/下一首）。
 - **智能音源自动匹配**：可自动切换到可用免费音源，并同步队列/歌单/喜欢状态。
-- **歌单广场与播客**：支持网易云歌单、我的歌单、RSS 播客订阅、Alist 站点配置，以及 Billboard 榜单查询。
+- **歌单广场**：支持网易云歌单、RSS 播客订阅、Alist 站点配置，以及 Billboard、台湾金曲奖、格莱美奖榜单查询。
 - **歌单管理增强**：支持搜索、去重、导出、封面设置、URL 添加歌曲，支持主流音乐平台的歌单导入。
 - **下载管理**: 支持选择下载音质、下载目录、是否嵌入歌词或封面
 - **播放生态**：支持播放列表、最近播放、个人歌单、歌词显示、音质选择、倍速调节、睡眠定时、主题切换与数据同步配置。
@@ -174,6 +174,7 @@ shared/                     # 跨端共享类型
 - [GD Studio](https://music-api.gdstudio.xyz/api.php)：免费音源 API 服务支持
 - [洛雪音乐音源](https://github.com/Huibq/keep-alive)
 - [Listen1](https://github.com/listen1/listen1_chrome_extension/blob/master/js/provider)：网易云/咪咕/B站官方接口实现参考
+- [Chartly API](https://github.com/DJChanahCJD/Chartly)：金曲奖/格莱美奖 API
 
 ## 🤝 贡献
 

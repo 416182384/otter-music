@@ -74,6 +74,11 @@ const BillboardChart = lazy(() =>
     default: m.BillboardChart,
   }))
 );
+const AwardsChart = lazy(() =>
+  import("@/components/AwardsChart").then((m) => ({
+    default: m.AwardsChart,
+  }))
+);
 
 // ==========================================
 // 2. 核心优化 Hooks & HOC
@@ -375,4 +380,14 @@ export const BillboardChartRoute = withSuspense(() => {
       isPlaying={isPlaying}
     />
   );
+});
+
+export const AwardsChartRoute = withSuspense(() => {
+  const { awardId } = useParams<{ awardId: string }>();
+  const [searchParams] = useSearchParams();
+  const yearParam = Number(searchParams.get("year"));
+  const year =
+    Number.isInteger(yearParam) && yearParam > 0 ? yearParam : undefined;
+
+  return <AwardsChart awardId={awardId ?? ""} year={year} />;
 });

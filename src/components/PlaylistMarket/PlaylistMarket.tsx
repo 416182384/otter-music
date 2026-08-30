@@ -34,6 +34,7 @@ import { PlaylistGrid } from "./PlaylistGrid";
 import { PodcastSection } from "./PodcastSection";
 import { AlistSection } from "./AlistSection";
 import { BillboardSection } from "./BillboardSection";
+import { AwardsSection } from "./AwardsSection";
 import { useAlistStore } from "@/store/alist-store";
 import { logger } from "@/lib/logger";
 
@@ -49,6 +50,7 @@ const MARKET_SECTIONS: Record<string, ComponentType> = {
   播客: PodcastSection,
   Alist: AlistSection,
   Billboard: BillboardSection,
+  Awards: AwardsSection,
 };
 
 export function PlaylistMarket() {
@@ -242,7 +244,7 @@ export function PlaylistMarket() {
     saveSearchCache(null);
   }, [saveSearchCache]);
 
-  // Billboard 子 tab 各自记忆滚动位置，故 scroll key 附加 billboardGroup
+  // Billboard 子 tab 记忆滚动位置，故 scroll key 附加子 tab 标识
   const { scrollRef } = useScrollSave(
     `scroll-${snapshotKey}${activeCategory === "Billboard" ? `:${billboardGroup}` : ""}`,
     !searchQuery &&
