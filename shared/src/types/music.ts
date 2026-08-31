@@ -37,8 +37,6 @@ export const searchOptions: Record<string, string> = {
   migu: "Migu",
   bilibili: "B站",
   qq: "QQ音乐",
-  lx_kuwo: "小蜗音乐",
-  lx_qq: "小秋音乐",
 };
 
 export const sourceLabels: Record<string, string> = {
@@ -49,8 +47,6 @@ export const sourceLabels: Record<string, string> = {
   migu: "Migu",
   bilibili: "B站",
   qq: "QQ",
-  lx_kuwo: "小蜗",
-  lx_qq: "小秋",
   alist: "Alist",
 };
 
@@ -86,16 +82,6 @@ export const aggregatedSourceOptions: {
     label: "QQ音乐",
     description: "QQ音乐官方",
   },
-  {
-    value: "lx_kuwo",
-    label: "小蜗音乐",
-    description: "酷我音源（洛雪）",
-  },
-  {
-    value: "lx_qq",
-    label: "小秋音乐",
-    description: "QQ音源（洛雪）",
-  },
 ];
 
 export const sourceBadgeStyles: Record<string, string> = {
@@ -110,10 +96,6 @@ export const sourceBadgeStyles: Record<string, string> = {
   migu: "text-pink-500 border-pink-500/30 bg-pink-500/5 hover:bg-pink-500/10",
   bilibili:
     "text-pink-500/70 border-pink-500/20 bg-pink-500/5 hover:bg-pink-500/10",
-  lx_kuwo:
-    "text-amber-500/70 border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
-  lx_qq:
-    "text-yellow-500/70 border-yellow-500/20 bg-yellow-500/5 hover:bg-yellow-500/10",
   default:
     "text-muted-foreground/70 border-border bg-muted/30 hover:bg-muted/50",
 };
@@ -132,8 +114,6 @@ export const DEFAULT_SOURCE_CONFIGS: SourceConfig[] = [
   { source: "kuwo", enabled: false, visible: true },
   { source: "migu", enabled: false, visible: true },
   { source: "qq", enabled: false, visible: true },
-  { source: "lx_kuwo", enabled: false, visible: true },
-  { source: "lx_qq", enabled: false, visible: true },
 ];
 
 export type MusicSource =
@@ -166,8 +146,6 @@ export type MusicSource =
   | "apple"
   | "all"
   | "local"
-  | "lx_kuwo"
-  | "lx_qq"
   | "alist";
 
 export interface SearchIntent {

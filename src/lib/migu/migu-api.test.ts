@@ -360,9 +360,11 @@ const sampleV3SearchSong = {
 
 describe("searchMiguSongs (dev)", () => {
   it("uses simple headers to app.u.nf.migu.cn", async () => {
-    const fetchWithTimeout = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify([sampleV3SearchSong]), { status: 200 })
-    );
+    const fetchWithTimeout = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify([sampleV3SearchSong]), { status: 200 })
+      );
     vi.doMock("@/lib/api/config", () => ({
       fetchWithTimeout,
       getApiUrl: vi.fn(),
@@ -385,8 +387,9 @@ describe("searchMiguSongs (dev)", () => {
     const url = String(fetchWithTimeout.mock.calls[0][0]);
     expect(url).toContain("/api/migu-v3/pc/resource/song/item/search/v1.0");
     const opts = fetchWithTimeout.mock.calls[0][1];
-    expect(opts.headers).toHaveProperty("channel", "0146951");
-    expect(opts.headers).toHaveProperty("uid", "1234");
+    // V3 搜索接口不兼容 channel/uid 请求头，携带会返回 860002
+    expect(opts.headers?.channel).toBeUndefined();
+    expect(opts.headers?.uid).toBeUndefined();
   });
 
   it("returns empty on non-ok response", async () => {
@@ -426,9 +429,7 @@ describe("searchMiguSongs (dev)", () => {
     vi.doMock("@/lib/api/config", () => ({
       fetchWithTimeout: vi
         .fn()
-        .mockResolvedValue(
-          new Response(JSON.stringify([]), { status: 200 })
-        ),
+        .mockResolvedValue(new Response(JSON.stringify([]), { status: 200 })),
       getApiUrl: vi.fn(),
       getProxyUrl: vi.fn(),
       IS_NATIVE: false,
@@ -467,7 +468,8 @@ describe("searchMiguSongs (native)", () => {
     expect(call.url).toContain(
       "https://app.u.nf.migu.cn/pc/resource/song/item/search/v1.0"
     );
-    expect(call.headers).toHaveProperty("channel", "0146951");
+    // V3 搜索接口不兼容 channel/uid 请求头，携带会返回 860002
+    expect(call.headers?.channel).toBeUndefined();
   });
 
   it("returns empty on native HTTP error", async () => {
@@ -493,13 +495,11 @@ describe("searchMiguSongs (native)", () => {
 
 describe("searchMiguSongs (web prod)", () => {
   it("POSTs to the backend worker", async () => {
-    const fetchWithTimeout = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(JSON.stringify({ items: [], hasMore: false }), {
-          status: 200,
-        })
-      );
+    const fetchWithTimeout = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ items: [], hasMore: false }), {
+        status: 200,
+      })
+    );
     vi.doMock("@/lib/api/config", () => ({
       fetchWithTimeout,
       getApiUrl: () => "https://api.example.com",

@@ -262,15 +262,14 @@ export async function searchMiguSongs(
     return res.json();
   }
 
+  // V3 搜索接口（app.u.nf.migu.cn）不兼容 channel/uid 请求头，携带会返回 860002
   const path = buildMiguV3SearchPath(keyword, page, rows);
-  const headers = buildMiguHeaders();
 
   if (IS_NATIVE) {
     const { CapacitorHttp } = await import("@capacitor/core");
     const res = await CapacitorHttp.request({
       method: "GET",
       url: `https://app.u.nf.migu.cn${path}`,
-      headers,
     });
     if (res.status >= 400) return { items: [], hasMore: false };
     const data: unknown =
@@ -281,7 +280,7 @@ export async function searchMiguSongs(
   try {
     const res = await fetchWithTimeout(
       `/api/migu-v3${path}`,
-      { headers },
+      {},
       NETWORK_TIMEOUT
     );
     if (!res.ok) return { items: [], hasMore: false };
