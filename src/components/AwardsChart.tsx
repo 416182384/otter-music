@@ -25,6 +25,7 @@ import { getAwardMeta } from "@/lib/awards/awards-meta";
 import { searchAlbums, searchArtists } from "@/lib/netease/netease-api";
 import { isArtistMatch, isNameMatch } from "@/lib/utils/music-key";
 import { useMusicStore } from "@/store/music-store";
+import { useMarketSession } from "@/store/session/market-session";
 import type { SearchIntent } from "@/types/music";
 import { usePlayContextHandler } from "@/hooks/usePlayContextHandler";
 import { useImportPlaylist } from "@/hooks/useImportPlaylist";
@@ -96,7 +97,8 @@ interface AwardsChartProps {
  * （制作人/作词作曲/技术类）回落聚合搜索，关键词为「作品 人」
  * （装帧/录音/工程等技术署名类只搜作品名），无 kind 且 title 为
  * 专辑名时另设 album 意图加权排序。
- * year 缺省最新一届，通过 ?year= 切换（年份只在详情页内用原生 select 更改）。
+ * year 缺省时优先恢复会话缓存的上次浏览年份（无缓存则最新一届），
+ * 通过 ?year= 切换（年份只在详情页内用原生 select 更改）。
  */
 export function AwardsChart({ awardId, year }: AwardsChartProps) {
   const meta = getAwardMeta(awardId);
@@ -106,14 +108,26 @@ export function AwardsChart({ awardId, year }: AwardsChartProps) {
   const setSearchIntent = useMusicStore((s) => s.setSearchIntent);
   const setSearchResults = useMusicStore((s) => s.setSearchResults);
   const setSearchSource = useMusicStore((s) => s.setSearchSource);
+  const savedYear = useMarketSession((s) => s.awardYears[awardId]);
+  const setAwardYear = useMarketSession((s) => s.setAwardYear);
   const [data, setData] = useState<AwardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchingIndex, setSearchingIndex] = useState<number | null>(null);
   const searchingRef = useRef(false);
 
+  // 年份优先级：URL ?year= > 会话缓存的上次年份（需在 meta.years 内）> 最新一届
   const activeYear =
-    year && meta?.years.includes(year) ? year : (meta?.latestYear ?? 0);
+    year && meta?.years.includes(year)
+      ? year
+      : savedYear && meta?.years.includes(savedYear)
+        ? savedYear
+        : (meta?.latestYear ?? 0);
+
+  // 记录当前浏览的年份，供下次进入时恢复
+  useEffect(() => {
+    if (meta && activeYear) setAwardYear(awardId, activeYear);
+  }, [awardId, meta, activeYear, setAwardYear]);
 
   const songTracks = useMemo(() => (data ? toAwardTracks(data) : []), [data]);
   const onPlay = usePlayContextHandler(
@@ -146,7 +160,11 @@ export function AwardsChart({ awardId, year }: AwardsChartProps) {
 
   const changeYear = (y: number) => {
     if (!meta) return;
-    setSearchParams(y === meta.latestYear ? {} : { year: String(y) });
+    // replace 模式：切年份不污染历史栈，返回键直接回到进入前的页面；
+    // 年份记忆由会话缓存（awardYears）承担
+    setSearchParams(y === meta.latestYear ? {} : { year: String(y) }, {
+      replace: true,
+    });
   };
 
   const fallbackToSearch = useCallback(

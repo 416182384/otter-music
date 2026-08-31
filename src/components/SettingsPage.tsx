@@ -54,11 +54,13 @@ function SettingsSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-6">
-      <h3 className="text-sm font-medium text-muted-foreground mb-2 px-1">
+    <div className="mb-5">
+      <h3 className="text-xs font-medium text-muted-foreground mb-1.5 px-1">
         {title}
       </h3>
-      <div className="space-y-3">{children}</div>
+      <div className="rounded-xl bg-card/50 border border-border/50 divide-y divide-border/50 overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 }
@@ -66,7 +68,12 @@ function SettingsSection({
 export function SettingsPage({ onBack }: SettingsPageProps) {
   const navigate = useNavigate();
   const [dataBackupOpen, setDataBackupOpen] = useState(false);
-  const { enableUpdateNotify, setEnableUpdateNotify, allowSimultaneousPlayback, setAllowSimultaneousPlayback } = useAppStore();
+  const {
+    enableUpdateNotify,
+    setEnableUpdateNotify,
+    allowSimultaneousPlayback,
+    setAllowSimultaneousPlayback,
+  } = useAppStore();
   const {
     volume,
     setVolume,

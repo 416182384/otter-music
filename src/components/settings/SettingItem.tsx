@@ -43,18 +43,14 @@ export function SettingItem({
   return (
     <div
       ref={itemRef}
+      onClick={onClick}
       className={cn(
-        "p-4 rounded-xl bg-card/50 border border-border/50 transition-colors",
+        "px-4 py-3 transition-colors",
+        onClick && "cursor-pointer hover:bg-muted/20",
         className
       )}
     >
-      <div
-        className={cn(
-          "flex items-center justify-between min-h-7",
-          onClick && "cursor-pointer hover:bg-muted/20"
-        )}
-        onClick={onClick}
-      >
+      <div className="flex items-center justify-between min-h-7">
         <div className="flex items-center gap-3 flex-1 overflow-hidden">
           <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 flex-[0_0_36px] min-w-9 min-h-9">
             <div className="h-4 w-4 shrink-0 flex-[0_0_16px] min-w-4 min-h-4">
