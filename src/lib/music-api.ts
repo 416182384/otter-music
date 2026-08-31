@@ -12,7 +12,7 @@ import { searchSuggest } from "@/lib/netease/netease-api";
 import { MusicProviderFactory, isAbort } from "./music-provider";
 import { logger } from "@/lib/logger";
 
-const TTL_SHORT = 60 * 60 * 1000; // 60 minutes
+// const TTL_SHORT = 60 * 60 * 1000; // 60 minutes
 const TTL_LONG = 7 * 24 * 60 * 60 * 1000; // 7 days
 /** 签名直链时效不定，与 url-cache-store 的内存 TTL 保持一致，过期即重新解析 */
 const TTL_URL = 15 * 60 * 1000; // 15 minutes
